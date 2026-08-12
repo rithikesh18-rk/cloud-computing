@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Management - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Leave Management</h2>
+        <p class="text-muted mb-0">Review leave applications, requests, and approvals.</p>
+    </div>
+    <a href="{{ url_for('leave.apply') }}" class="btn btn-primary px-3 py-2 fw-semibold">
+        <i class="fa-solid fa-paper-plane me-1"></i> Apply for Leave
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="custom-card p-3 mb-4">
+    <form method="GET" action="{{ url_for('leave.index') }}" class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Approved" {% if status_filter == 'Approved' %}selected{% endif %}>Approved</option>
+                <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-dark w-100 fw-semibold">Filter</button>
+            {% if status_filter %}
+                <a href="{{ url_for('leave.index') }}" class="btn btn-outline-secondary" title="Clear Filter"><i class="fa-solid fa-rotate-left"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Leave Applications Table -->
+<div class="custom-card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table custom-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Employee Name</th>
+                    <th>Leave Type</th>
+                    <th>Duration</th>
+                    <th>Total Days</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Applied Date</th>
+                    {% if current_user.role == 'Admin' %}
+                    <th class="text-end">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if leaves %}
+                    {% for l in leaves %}
+                        <tr>
+                            <td class="fw-bold text-secondary">#{{ l.id }}</td>
+                            <td class="fw-semibold text-dark">{{ l.employee.full_name }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ l.leave_type }}</span></td>
+                            <td>{{ l.start_date.strftime('%Y-%m-%d') }} to {{ l.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td class="fw-bold">{{ l.total_days }} Days</td>
+                            <td class="text-muted small" style="max-width: 250px;">{{ l.reason or '-' }}</td>
+                            <td>
+                                <span class="badge {% if l.status == 'Approved' %}badge-active{% elif l.status == 'Pending' %}badge-leave{% else %}badge-terminated{% endif %}">
+                                    {{ l.status }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{{ l.applied_date.strftime('%Y-%m-%d') }}</td>
+                            {% if current_user.role == 'Admin' %}
+                            <td class="text-end">
+                                {% if l.status == 'Pending' %}
+                                    <form method="POST" action="{{ url_for('leave.approve', id=l.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                            <i class="fa-solid fa-check me-1"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('leave.reject', id=l.id) }}" class="d-inline ms-1">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject">
+                                            <i class="fa-solid fa-xmark me-1"></i> Reject
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted small">Processed</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-plane-slash fa-3x mb-3 opacity-25"></i>
+                            <h5>No Leave Applications Found</h5>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

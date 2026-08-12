@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}SaaS Dashboard - {{ college_settings.college_name }}{% endblock %}
+
+{% block content %}
+<!-- Commercial Header Banner -->
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="page-title"><i class="fas fa-grid-2 me-2 text-primary"></i> Institution Dashboard</h2>
+        <p class="page-subtitle mb-0">Overview for <strong>{{ college_settings.college_name }}</strong> | {{ college_settings.academic_year }} - {{ college_settings.semester }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('attendance.mark') }}" class="btn btn-primary fw-semibold shadow-sm">
+            <i class="fas fa-plus me-1"></i> Mark Attendance
+        </a>
+        <a href="{{ url_for('report.index') }}" class="btn btn-outline-secondary fw-semibold">
+            <i class="fas fa-file-download me-1"></i> Export Reports
+        </a>
+    </div>
+</div>
+
+<!-- Primary Metric Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Students</span>
+                <i class="fas fa-user-graduate text-primary"></i>
+            </div>
+            <h3 class="fw-extrabold text-dark my-1">{{ total_students }}</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">Active Enrolled</small>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Faculty</span>
+                <i class="fas fa-chalkboard-user text-success"></i>
+            </div>
+            <h3 class="fw-extrabold text-dark my-1">{{ total_faculty }}</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">Teaching Staff</small>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Departments</span>
+                <i class="fas fa-sitemap text-warning"></i>
+            </div>
+            <h3 class="fw-extrabold text-dark my-1">{{ total_departments }}</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">{{ total_subjects }} Subjects</small>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Working Days</span>
+                <i class="fas fa-calendar-days text-info"></i>
+            </div>
+            <h3 class="fw-extrabold text-dark my-1">{{ college_settings.working_days }}</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">Academic Term</small>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-emerald">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Today's Present</span>
+                <i class="fas fa-circle-check text-success"></i>
+            </div>
+            <h3 class="fw-extrabold text-success my-1">{{ today_present }}</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">Attended Today</small>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card card-custom h-100 p-3 border-start border-4 border-danger">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem;">Attendance %</span>
+                <i class="fas fa-chart-pie text-danger"></i>
+            </div>
+            <h3 class="fw-extrabold text-primary my-1">{{ today_percentage }}%</h3>
+            <small class="text-muted" style="font-size: 0.7rem;">Overall Rate</small>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1: Department Bar Chart & Donut Chart -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card card-custom h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="fas fa-chart-bar text-primary me-2"></i> Department Student Distribution</h5>
+                <span class="badge bg-light text-secondary border">Academic Year {{ college_settings.academic_year }}</span>
+            </div>
+            <div style="height: 260px;">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card card-custom h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="fas fa-chart-pie text-success me-2"></i> Today's Attendance Status</h5>
+                <span class="badge bg-light text-secondary border">Live Session Ratio</span>
+            </div>
+            <div style="height: 260px;">
+                <canvas id="todayDonutChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sessions & Activity Table -->
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h5 class="fw-bold text-dark mb-0"><i class="fas fa-history text-primary me-2"></i> Recent Attendance Sessions</h5>
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control form-control-sm table-search-input" data-target="#recentTable" placeholder="Search sessions...">
+            <a href="{{ url_for('attendance.view_sessions') }}" class="btn btn-outline-primary btn-sm fw-semibold">View All</a>
+        </div>
+    </div>
+
+    {% if recent_sessions %}
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0" id="recentTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Class / Section</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Attendance %</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in recent_sessions %}
+                {% set d = s.to_dict() %}
+                <tr>
+                    <td><strong class="text-dark">{{ s.attendance_date.strftime('%Y-%m-%d') }}</strong></td>
+                    <td><span class="badge bg-primary-subtle text-primary border font-monospace">{{ s.subject.code }}</span></td>
+                    <td>{{ s.subject.name }}</td>
+                    <td>{{ s.department.code }} - {{ s.year }} (Sec {{ s.section }})</td>
+                    <td><span class="badge badge-present">{{ d.present_count }}</span></td>
+                    <td><span class="badge badge-absent">{{ d.absent_count }}</span></td>
+                    <td>
+                        <span class="fw-bold {% if d.percentage >= college_settings.min_attendance_percentage %}text-success{% else %}text-danger{% endif %}">
+                            {{ d.percentage }}%
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{{ url_for('attendance.edit_session', session_id=s.id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="fas fa-folder-open fa-2x mb-2 text-secondary"></i>
+        <p>No attendance sessions recorded yet.</p>
+        <a href="{{ url_for('attendance.mark') }}" class="btn btn-primary btn-sm">Mark First Attendance</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Department Distribution Bar Chart
+    const deptData = {{ dept_stats|tojson }};
+    const deptLabels = deptData.map(d => d.name);
+    const deptCounts = deptData.map(d => d.count);
+
+    const ctxDept = document.getElementById('deptChart').getContext('2d');
+    new Chart(ctxDept, {
+        type: 'bar',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                label: 'Enrolled Students',
+                data: deptCounts,
+                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#06b6d4', '#9333ea', '#ec4899'],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, precision: 0 } }
+        }
+    });
+
+    // 2. Today's Attendance Status Donut Chart
+    const presentCount = {{ today_present }};
+    const absentCount = {{ today_absent }};
+
+    const ctxDonut = document.getElementById('todayDonutChart').getContext('2d');
+    new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                data: [presentCount, absentCount],
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,219 @@
+/* Commercial SaaS Premium Stylesheet - Attendance Management System */
+
+:root {
+    --font-family-base: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --secondary: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --sidebar-bg: #0f172a;
+    --sidebar-width: 260px;
+    --card-radius: 16px;
+    --card-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
+    --card-hover-shadow: 0 20px 35px -5px rgba(37, 99, 235, 0.12), 0 10px 15px -5px rgba(37, 99, 235, 0.04);
+}
+
+body.saas-layout {
+    font-family: var(--font-family-base);
+    background-color: #f8fafc;
+    color: #1e293b;
+    overflow-x: hidden;
+}
+
+/* Sidebar Wrapper */
+#wrapper {
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: var(--sidebar-width);
+    margin-left: 0;
+    transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(--sidebar-bg) !important;
+    z-index: 1040;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: calc(-1 * var(--sidebar-width));
+}
+
+.sidebar-header {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+.sidebar-nav-container .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: all 0.2s ease;
+}
+
+.sidebar-nav-container .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.sidebar-nav-container .nav-link.active {
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.width-20 {
+    width: 20px;
+    text-align: center;
+}
+
+/* Top Navbar */
+.top-navbar {
+    z-index: 1030;
+    height: 64px;
+}
+
+/* Glassmorphism Cards */
+.card-custom {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-custom:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+}
+
+.card-glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Page Headers */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Metric Cards & Stat Icons */
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.stat-icon-blue { background: #dbeafe; color: #2563eb; }
+.stat-icon-green { background: #d1fae5; color: #10b981; }
+.stat-icon-amber { background: #fef3c7; color: #d97706; }
+.stat-icon-purple { background: #f3e8ff; color: #9333ea; }
+.stat-icon-red { background: #fee2e2; color: #ef4444; }
+
+/* Custom Tables */
+.table-custom {
+    vertical-align: middle;
+}
+
+.table-custom thead th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 16px;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Badges */
+.badge-present {
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.badge-absent {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Auth Login Card */
+.login-card {
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
+    overflow: hidden;
+}
+
+.login-header-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+
+.login-body {
+    padding: 2.5rem 2rem;
+}
+
+/* Print Styles */
+@media print {
+    #sidebar-wrapper, .top-navbar, footer, .d-print-none, .btn, form {
+        display: none !important;
+    }
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    .card-custom {
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+
+/* Dark Theme Overrides */
+[data-bs-theme="dark"] body {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+[data-bs-theme="dark"] .card-custom {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+[data-bs-theme="dark"] .table-custom thead th {
+    background-color: #334155;
+    color: #cbd5e1;
+    border-bottom-color: #475569;
+}
+[data-bs-theme="dark"] .table-custom tbody tr:hover {
+    background-color: #334155;
+}
+[data-bs-theme="dark"] .top-navbar, [data-bs-theme="dark"] footer {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}

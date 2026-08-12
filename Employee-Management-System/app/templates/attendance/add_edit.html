@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('attendance.index') }}" class="text-secondary text-decoration-none small">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Attendance
+    </a>
+    <h2 class="fw-bold mt-2">{{ title }}</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="custom-card p-4">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="employee_id" class="form-label fw-semibold">Employee *</label>
+                        {{ form.employee_id(class="form-select") }}
+                        {% for error in form.employee_id.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="attendance_date" class="form-label fw-semibold">Attendance Date *</label>
+                        {{ form.attendance_date(class="form-control", type="date") }}
+                        {% for error in form.attendance_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="check_in" class="form-label fw-semibold">Check In Time</label>
+                        {{ form.check_in(class="form-control", type="time") }}
+                        {% for error in form.check_in.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="check_out" class="form-label fw-semibold">Check Out Time</label>
+                        {{ form.check_out(class="form-control", type="time") }}
+                        {% for error in form.check_out.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="status" class="form-label fw-semibold">Attendance Status *</label>
+                        {{ form.status(class="form-select") }}
+                        {% for error in form.status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="remarks" class="form-label fw-semibold">Remarks / Notes</label>
+                    {{ form.remarks(class="form-control", placeholder="Optional notes (e.g. Worked late, On field visit)...") }}
+                    {% for error in form.remarks.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('attendance.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    {{ form.submit(class="btn btn-primary px-4 fw-semibold") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

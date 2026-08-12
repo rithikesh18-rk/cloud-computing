@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Students - {{ college_settings.college_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="page-title"><i class="fas fa-user-graduate me-2 text-primary"></i> Student Management</h2>
+        <p class="page-subtitle mb-0">Manage student accounts, registration numbers, roll numbers, and security credentials.</p>
+    </div>
+    <button type="button" class="btn btn-primary fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+        <i class="fas fa-plus me-1"></i> Add New Student
+    </button>
+</div>
+
+<!-- Student List Card with Search Bar -->
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h5 class="fw-bold text-dark mb-0"><i class="fas fa-users text-primary me-2"></i> Enrolled Student Directory</h5>
+        <div class="d-flex gap-2" style="max-width: 320px;">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 table-search-input" data-target="#studentsTable" placeholder="Search by name, roll, reg #...">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0" id="studentsTable">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Roll No</th>
+                    <th>Reg No</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Department</th>
+                    <th>Year & Sec</th>
+                    <th>Phone</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if students %}
+                    {% for st in students %}
+                    <tr>
+                        <td><span class="badge bg-light text-dark border font-monospace">{{ st.user_id_code }}</span></td>
+                        <td><strong class="text-dark">{{ st.roll_number or 'N/A' }}</strong></td>
+                        <td><span class="badge bg-secondary-subtle text-secondary font-monospace">{{ st.register_number or '-' }}</span></td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ st.full_name }}</div>
+                        </td>
+                        <td>{{ st.email }}</td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary border">
+                                {{ st.department.code if st.department else 'Unassigned' }}
+                            </span>
+                        </td>
+                        <td>{{ st.year or '' }} {% if st.section %}(Sec {{ st.section }}){% endif %}</td>
+                        <td>{{ st.phone_number or '-' }}</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editStudentModal{{ st.id }}" title="Edit Details">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ st.id }}" title="Reset Password">
+                                <i class="fas fa-key"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteStudentModal{{ st.id }}" title="Delete Student">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal: Edit Student -->
+                    <div class="modal fade" id="editStudentModal{{ st.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title fw-bold"><i class="fas fa-user-pen me-2"></i> Edit Student - {{ st.user_id_code }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ url_for('admin.edit_student', id=st.id) }}" method="POST">
+                                    <div class="modal-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Full Name *</label>
+                                                <input type="text" class="form-control" name="full_name" value="{{ st.full_name }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Email Address (Unique) *</label>
+                                                <input type="email" class="form-control" name="email" value="{{ st.email }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Roll Number *</label>
+                                                <input type="text" class="form-control" name="roll_number" value="{{ st.roll_number }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Register Number</label>
+                                                <input type="text" class="form-control" name="register_number" value="{{ st.register_number or '' }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Department *</label>
+                                                <select class="form-select" name="department_id" required>
+                                                    {% for dept in departments %}
+                                                        <option value="{{ dept.id }}" {% if st.department_id == dept.id %}selected{% endif %}>{{ dept.name }} ({{ dept.code }})</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold">Year</label>
+                                                <select class="form-select" name="year">
+                                                    <option value="1st Year" {% if st.year == '1st Year' %}selected{% endif %}>1st Year</option>
+                                                    <option value="2nd Year" {% if st.year == '2nd Year' %}selected{% endif %}>2nd Year</option>
+                                                    <option value="3rd Year" {% if st.year == '3rd Year' %}selected{% endif %}>3rd Year</option>
+                                                    <option value="4th Year" {% if st.year == '4th Year' %}selected{% endif %}>4th Year</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold">Section</label>
+                                                <input type="text" class="form-control" name="section" value="{{ st.section or 'A' }}">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label fw-semibold">Phone Number</label>
+                                                <input type="text" class="form-control" name="phone_number" value="{{ st.phone_number or '' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal: Reset Password -->
+                    <div class="modal fade" id="resetPasswordModal{{ st.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-warning text-dark">
+                                    <h5 class="modal-title fw-bold"><i class="fas fa-key me-2"></i> Reset Password</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ url_for('admin.reset_student_password', id=st.id) }}" method="POST">
+                                    <div class="modal-body">
+                                        <p>Resetting password for <strong>{{ st.full_name }}</strong> ({{ st.user_id_code }}).</p>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">New Password</label>
+                                            <input type="password" class="form-control" name="new_password" placeholder="Enter new password" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">Reset Password</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal: Delete Student -->
+                    <div class="modal fade" id="deleteStudentModal{{ st.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title fw-bold"><i class="fas fa-triangle-exclamation me-2"></i> Confirm Delete</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to permanently delete student account <strong>{{ st.full_name }}</strong> ({{ st.user_id_code }})?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('admin.delete_student', id=st.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-danger">Yes, Delete Account</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="fas fa-user-slash fa-2x mb-2"></i><br>
+                            No student accounts found. Click "Add New Student" above to create one.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Add Student -->
+<div class="modal fade" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-user-plus me-2"></i> Add New Student</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admin.add_student') }}" method="POST">
+                <div class="modal-body">
+                    <div class="alert alert-info py-2" style="font-size: 0.85rem;">
+                        <i class="fas fa-info-circle me-1"></i> Auto-generated Student ID: <strong>{{ new_student_id }}</strong>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name *</label>
+                            <input type="text" class="form-control" name="full_name" placeholder="e.g. Alex Johnson" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address (Unique) *</label>
+                            <input type="email" class="form-control" name="email" placeholder="alex@college.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Password *</label>
+                            <input type="password" class="form-control" name="password" placeholder="Secure password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Roll Number *</label>
+                            <input type="text" class="form-control" name="roll_number" placeholder="e.g. 2026-CS-045" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Register Number</label>
+                            <input type="text" class="form-control" name="register_number" placeholder="e.g. REG20260045">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Department *</label>
+                            <select class="form-select" name="department_id" required>
+                                <option value="">-- Select Department --</option>
+                                {% for dept in departments %}
+                                    <option value="{{ dept.id }}">{{ dept.name }} ({{ dept.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Year</label>
+                            <select class="form-select" name="year">
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year" selected>2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Section</label>
+                            <input type="text" class="form-control" name="section" value="A">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number (Optional)</label>
+                            <input type="text" class="form-control" name="phone_number" placeholder="+1 (555) 000-0000">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-semibold">Create Student Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

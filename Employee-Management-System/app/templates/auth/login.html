@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - WorkPulse{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="fa-solid fa-users-gear text-primary fa-3x"></i>
+            </div>
+            <h3 class="fw-bold">Sign In</h3>
+            <p class="text-muted small">Employee Management System</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3">
+                <label for="username" class="form-label fw-semibold small">Username</label>
+                {{ form.username(class="form-control form-control-lg fs-6", placeholder="Enter your username") }}
+                {% for error in form.username.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label fw-semibold small">Password</label>
+                {{ form.password(class="form-control form-control-lg fs-6", placeholder="Enter your password") }}
+                {% for error in form.password.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    {{ form.remember_me(class="form-check-input") }}
+                    <label class="form-check-label small" for="remember_me">Remember me</label>
+                </div>
+            </div>
+
+            <div class="d-grid mb-3">
+                {{ form.submit(class="btn btn-primary btn-lg fs-6 fw-semibold") }}
+            </div>
+
+            <div class="text-center">
+                <p class="small text-muted mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary fw-semibold text-decoration-none">Register</a></p>
+            </div>
+        </form>
+
+        <div class="mt-4 p-3 bg-light rounded text-center border">
+            <small class="text-muted d-block">Demo Admin Credentials:</small>
+            <code class="fw-bold">admin</code> / <code class="fw-bold">admin123</code>
+        </div>
+    </div>
+</div>
+{% endblock %}

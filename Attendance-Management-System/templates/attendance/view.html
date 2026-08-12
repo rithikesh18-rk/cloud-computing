@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}View Attendance Logs - {{ college_settings.college_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h2 class="page-title"><i class="fas fa-history me-2 text-primary"></i> Saved Attendance Sessions</h2>
+        <p class="page-subtitle mb-0">Browse historical class attendance sessions and modify entries when necessary.</p>
+    </div>
+    <a href="{{ url_for('attendance.mark') }}" class="btn btn-success fw-semibold shadow-sm">
+        <i class="fas fa-plus-circle me-1"></i> Mark New Attendance
+    </a>
+</div>
+
+<!-- Search / Filter Bar -->
+<div class="card card-custom p-3 mb-4">
+    <form action="{{ url_for('attendance.view_sessions') }}" method="GET" class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold small text-secondary">Filter Department</label>
+            <select class="form-select form-select-sm" name="department_id">
+                <option value="">All Departments</option>
+                {% for d in departments %}
+                    <option value="{{ d.id }}" {% if selected_dept == d.id %}selected{% endif %}>{{ d.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold small text-secondary">Filter Subject</label>
+            <select class="form-select form-select-sm" name="subject_id">
+                <option value="">All Subjects</option>
+                {% for s in subjects %}
+                    <option value="{{ s.id }}" {% if selected_subj == s.id %}selected{% endif %}>{{ s.name }} ({{ s.code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold small text-secondary">Date</label>
+            <input type="date" class="form-control form-control-sm" name="attendance_date" value="{{ selected_date or '' }}">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100 fw-semibold">Filter</button>
+            <a href="{{ url_for('attendance.view_sessions') }}" class="btn btn-outline-secondary btn-sm" title="Reset Filters"><i class="fas fa-undo"></i></a>
+        </div>
+    </form>
+</div>
+
+<!-- Sessions Table -->
+<div class="card card-custom p-4">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Department</th>
+                    <th>Subject</th>
+                    <th>Class / Section</th>
+                    <th>Total Students</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Attendance %</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if sessions %}
+                    {% for s in sessions %}
+                    {% set data = s.to_dict() %}
+                    <tr>
+                        <td><strong class="text-dark">{{ s.attendance_date.strftime('%Y-%m-%d') }}</strong></td>
+                        <td><span class="badge bg-primary-subtle text-primary border">{{ s.department.code }}</span></td>
+                        <td>
+                            <div><strong>{{ s.subject.code }}</strong></div>
+                            <small class="text-muted">{{ s.subject.name }}</small>
+                        </td>
+                        <td>{{ s.year }} (Sec {{ s.section }})</td>
+                        <td>{{ data.total_students }}</td>
+                        <td><span class="badge badge-present">{{ data.present_count }}</span></td>
+                        <td><span class="badge badge-absent">{{ data.absent_count }}</span></td>
+                        <td>
+                            <span class="fw-bold {% if data.percentage >= 75 %}text-success{% else %}text-danger{% endif %}">
+                                {{ data.percentage }}%
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('attendance.edit_session', session_id=s.id) }}" class="btn btn-sm btn-outline-primary fw-semibold me-1" title="Edit Session">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSessionModal{{ s.id }}" title="Delete Session">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Delete Session Modal -->
+                    <div class="modal fade" id="deleteSessionModal{{ s.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Confirm Session Deletion</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-start">
+                                    Are you sure you want to delete attendance record for <strong>{{ s.subject.name }}</strong> on <strong>{{ s.attendance_date.strftime('%Y-%m-%d') }}</strong>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('attendance.delete_session', session_id=s.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-danger">Yes, Delete Record</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            No attendance records match your filter criteria.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

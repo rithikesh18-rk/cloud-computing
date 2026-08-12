@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('employees.index') }}" class="text-secondary text-decoration-none small">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Employee Directory
+    </a>
+    <h2 class="fw-bold mt-2">{{ title }}</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-10">
+        <div class="custom-card p-4">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <!-- Section 1: Basic Identity -->
+                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-id-card me-2"></i>Basic Identity</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="employee_id" class="form-label fw-semibold">Employee ID *</label>
+                        {{ form.employee_id(class="form-control", placeholder="EMP001") }}
+                        {% for error in form.employee_id.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="first_name" class="form-label fw-semibold">First Name *</label>
+                        {{ form.first_name(class="form-control", placeholder="John") }}
+                        {% for error in form.first_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="last_name" class="form-label fw-semibold">Last Name *</label>
+                        {{ form.last_name(class="form-control", placeholder="Doe") }}
+                        {% for error in form.last_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <!-- Section 2: Contact & Personal Details -->
+                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i>Personal & Contact Details</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-semibold">Email Address *</label>
+                        {{ form.email(class="form-control", placeholder="john.doe@company.com") }}
+                        {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                        {{ form.phone(class="form-control", placeholder="+1 555-0199") }}
+                        {% for error in form.phone.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="gender" class="form-label fw-semibold">Gender</label>
+                        {{ form.gender(class="form-select") }}
+                        {% for error in form.gender.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="date_of_birth" class="form-label fw-semibold">Date of Birth</label>
+                        {{ form.date_of_birth(class="form-control", type="date") }}
+                        {% for error in form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-8">
+                        <label for="address" class="form-label fw-semibold">Residential Address</label>
+                        {{ form.address(class="form-control", rows="1", placeholder="Street address...") }}
+                        {% for error in form.address.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="city" class="form-label fw-semibold">City</label>
+                        {{ form.city(class="form-control", placeholder="New York") }}
+                        {% for error in form.city.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="state" class="form-label fw-semibold">State / Province</label>
+                        {{ form.state(class="form-control", placeholder="NY") }}
+                        {% for error in form.state.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="country" class="form-label fw-semibold">Country</label>
+                        {{ form.country(class="form-control", placeholder="USA") }}
+                        {% for error in form.country.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="pincode" class="form-label fw-semibold">Postal Code / Pincode</label>
+                        {{ form.pincode(class="form-control", placeholder="10001") }}
+                        {% for error in form.pincode.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <!-- Section 3: Employment & Designation -->
+                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-briefcase me-2"></i>Job & Compensation</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="department_id" class="form-label fw-semibold">Department *</label>
+                        {{ form.department_id(class="form-select") }}
+                        {% for error in form.department_id.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="designation" class="form-label fw-semibold">Designation / Job Title *</label>
+                        {{ form.designation(class="form-control", placeholder="Software Engineer") }}
+                        {% for error in form.designation.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="salary" class="form-label fw-semibold">Annual Salary ($) *</label>
+                        {{ form.salary(class="form-control", placeholder="85000") }}
+                        {% for error in form.salary.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="joining_date" class="form-label fw-semibold">Joining Date *</label>
+                        {{ form.joining_date(class="form-control", type="date") }}
+                        {% for error in form.joining_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="status" class="form-label fw-semibold">Employment Status *</label>
+                        {{ form.status(class="form-select") }}
+                        {% for error in form.status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <!-- Section 4: Profile Image Upload -->
+                <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-image me-2"></i>Profile Image</h5>
+                <div class="mb-4">
+                    {{ form.profile_image(class="form-control") }}
+                    {% for error in form.profile_image.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    <small class="text-muted">Allowed formats: .jpg, .png, .jpeg, .gif (Recommended resolution: 300x300)</small>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('employees.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    {{ form.submit(class="btn btn-primary px-4 fw-semibold") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

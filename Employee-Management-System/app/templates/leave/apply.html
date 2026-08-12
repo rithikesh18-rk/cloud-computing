@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Leave - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('leave.index') }}" class="text-secondary text-decoration-none small">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Leave Requests
+    </a>
+    <h2 class="fw-bold mt-2">Apply for Leave</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="custom-card p-4">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-4">
+                    <label for="leave_type" class="form-label fw-semibold">Leave Type *</label>
+                    {{ form.leave_type(class="form-select") }}
+                    {% for error in form.leave_type.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="start_date" class="form-label fw-semibold">Start Date *</label>
+                        {{ form.start_date(class="form-control", type="date") }}
+                        {% for error in form.start_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="end_date" class="form-label fw-semibold">End Date *</label>
+                        {{ form.end_date(class="form-control", type="date") }}
+                        {% for error in form.end_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="reason" class="form-label fw-semibold">Reason for Leave *</label>
+                    {{ form.reason(class="form-control", rows="4", placeholder="Please provide details for your leave request...") }}
+                    {% for error in form.reason.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('leave.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    {{ form.submit(class="btn btn-primary px-4 fw-semibold") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

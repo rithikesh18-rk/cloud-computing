@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">HR & Workforce Dashboard</h2>
+        <p class="text-muted mb-0">Welcome back, {{ current_user.username }}. Here is today's overview.</p>
+    </div>
+    {% if current_user.role == 'Admin' %}
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('employees.add') }}" class="btn btn-primary px-3 py-2 fw-semibold">
+            <i class="fa-solid fa-user-plus me-1"></i> Add Employee
+        </a>
+        <a href="{{ url_for('attendance.add') }}" class="btn btn-outline-primary px-3 py-2 fw-semibold">
+            <i class="fa-solid fa-calendar-check me-1"></i> Mark Attendance
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Metrics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-2-4 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-icon blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Total Employees</div>
+                <div class="fs-3 fw-bold">{{ total_employees }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2-4 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-icon purple">
+                <i class="fa-solid fa-sitemap"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Departments</div>
+                <div class="fs-3 fw-bold">{{ total_departments }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2-4 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-icon green">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Present Today</div>
+                <div class="fs-3 fw-bold">{{ present_today }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2-4 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-icon red">
+                <i class="fa-solid fa-user-xmark"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Absent Today</div>
+                <div class="fs-3 fw-bold">{{ absent_today }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2-4 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-icon yellow">
+                <i class="fa-solid fa-plane-departure"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Pending Leaves</div>
+                <div class="fs-3 fw-bold">{{ pending_leaves }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Chart Column 1: Employees by Department -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Employees by Department</h5>
+            {% if dept_counts %}
+                <div style="max-height: 280px;" class="d-flex justify-content-center">
+                    <canvas id="departmentChart"></canvas>
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-folder-open fa-2x mb-2 opacity-50"></i>
+                    <p>No department data available.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Chart Column 2: Attendance Overview -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Attendance Overview</h5>
+            <div style="max-height: 280px;" class="d-flex justify-content-center">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Recent Employees -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock me-2 text-primary"></i>Recent Additions</h5>
+                <a href="{{ url_for('employees.index') }}" class="text-primary small text-decoration-none fw-semibold">View Directory</a>
+            </div>
+            {% if recent_employees %}
+                <div class="list-group list-group-flush">
+                    {% for emp in recent_employees %}
+                        <a href="{{ url_for('employees.view', id=emp.id) }}" class="list-group-item list-group-item-action border-0 px-0 py-3 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle p-2 me-3 text-primary fw-bold" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    {{ emp.first_name[0] }}{{ emp.last_name[0] }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold text-dark">{{ emp.full_name }}</div>
+                                    <div class="text-muted small">{{ emp.designation }} &bull; {{ emp.department.department_name if emp.department else 'Unassigned' }}</div>
+                                </div>
+                            </div>
+                            <span class="badge {% if emp.status == 'Active' %}badge-active{% else %}badge-terminated{% endif %}">
+                                {{ emp.status }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">No recent employee records.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Leave Requests -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-plane-departure me-2 text-primary"></i>Pending Leave Requests</h5>
+                <a href="{{ url_for('leave.index') }}" class="text-primary small text-decoration-none fw-semibold">Manage Leaves</a>
+            </div>
+            {% if recent_leaves %}
+                <div class="list-group list-group-flush">
+                    {% for l in recent_leaves %}
+                        <div class="list-group-item border-0 px-0 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold text-dark">{{ l.employee.full_name }}</div>
+                                <div class="text-muted small">{{ l.leave_type }} &bull; {{ l.total_days }} Days ({{ l.start_date.strftime('%b %d') }} - {{ l.end_date.strftime('%b %d') }})</div>
+                            </div>
+                            <div>
+                                {% if l.status == 'Pending' and current_user.role == 'Admin' %}
+                                    <form method="POST" action="{{ url_for('leave.approve', id=l.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success py-1 px-2" title="Approve"><i class="fa-solid fa-check"></i></button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('leave.reject', id=l.id) }}" class="d-inline ms-1">
+                                        <button type="submit" class="btn btn-sm btn-danger py-1 px-2" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                {% else %}
+                                    <span class="badge {% if l.status == 'Approved' %}badge-active{% elif l.status == 'Pending' %}badge-leave{% else %}badge-terminated{% endif %}">
+                                        {{ l.status }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">No pending leave requests.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if dept_counts %}
+    const ctx1 = document.getElementById('departmentChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: {{ dept_labels|tojson }},
+            datasets: [{
+                data: {{ dept_counts|tojson }},
+                backgroundColor: ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+                borderWidth: 2
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    {% endif %}
+
+    const ctx2 = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ att_labels|tojson }},
+            datasets: [{
+                label: 'Records',
+                data: {{ att_counts|tojson }},
+                backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6'],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
+{% endblock %}

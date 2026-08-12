@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login - {{ college_settings.college_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-75 py-4">
+    <div class="col-md-6 col-lg-5 col-xl-4">
+
+        <div class="card login-card">
+            <!-- Dynamic College Banner -->
+            <div class="login-header-banner">
+                {% if college_settings.college_logo and college_settings.college_logo != 'default_logo.png' %}
+                    <img src="{{ url_for('static', filename='uploads/' + college_settings.college_logo) }}" alt="Logo" class="college-logo-img mb-3" style="width: 64px; height: 64px;">
+                {% else %}
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-university fa-2x"></i>
+                    </div>
+                {% endif %}
+                <h4 class="fw-bold mb-1">{{ college_settings.college_name }}</h4>
+                <p class="small text-white-50 mb-0"><i class="fas fa-map-marker-alt me-1"></i> {{ college_settings.address }}</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-body">
+                <h5 class="fw-bold text-dark text-center mb-4">Sign In to Your Account</h5>
+
+                <form action="{{ url_for('auth.login') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold text-secondary">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control form-control-custom border-start-0" id="email" name="email" placeholder="name@college.com" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold text-secondary">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control form-control-custom border-start-0" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold rounded-3 shadow-sm mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Log In
+                    </button>
+                </form>
+
+              
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

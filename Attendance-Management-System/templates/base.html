@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ college_settings.theme or 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ college_settings.college_name }}{% endblock %} - Attendance SaaS System</title>
+
+    <!-- Google Fonts: Poppins & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Pro -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom Commercial SaaS CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="saas-layout">
+
+    <div class="d-flex" id="wrapper">
+        {% if current_user_role %}
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar-wrapper" class="bg-dark text-white border-end">
+            <div class="sidebar-header d-flex align-items-center justify-content-between p-3 border-bottom border-secondary-subtle">
+                <a href="{{ url_for('auth.dashboard') }}" class="d-flex align-items-center gap-3 text-decoration-none text-white">
+                    {% if college_settings.college_logo and college_settings.college_logo != 'default_logo.png' %}
+                        <img src="{{ url_for('static', filename='uploads/' + college_settings.college_logo) }}" alt="Logo" class="rounded-3 shadow-sm" style="width: 40px; height: 40px; object-fit: contain; background: #ffffff; padding: 2px;">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 40px; height: 40px;">
+                            <i class="fas fa-graduation-cap fs-5"></i>
+                        </div>
+                    {% endif %}
+                    <div class="lh-sm sidebar-brand-text">
+                        <div class="fw-bold text-truncate" style="max-width: 140px; font-size: 0.95rem;">{{ college_settings.college_name }}</div>
+                        <small class="text-white-50 style-mono" style="font-size: 0.7rem;">{{ college_settings.academic_year }}</small>
+                    </div>
+                </a>
+            </div>
+
+            <div class="sidebar-nav-container py-3">
+                <ul class="nav flex-column gap-1 px-2">
+                    {% if current_user_role in ['admin', 'faculty'] %}
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold" style="font-size: 0.68rem;">Main Menu</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'admin.dashboard' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('admin.dashboard') }}">
+                            <i class="fas fa-grid-2 me-1 width-20"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold mt-3" style="font-size: 0.68rem;">Attendance</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'attendance.mark' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('attendance.mark') }}">
+                            <i class="fas fa-check-circle me-1 width-20"></i> <span>Mark Attendance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'attendance.view_sessions' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('attendance.view_sessions') }}">
+                            <i class="fas fa-clock-rotate-left me-1 width-20"></i> <span>Attendance History</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold mt-3" style="font-size: 0.68rem;">Analytics</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if 'report' in request.endpoint %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('report.index') }}">
+                            <i class="fas fa-chart-line me-1 width-20"></i> <span>Reports Hub</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user_role == 'admin' %}
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold mt-3" style="font-size: 0.68rem;">Management</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'admin.students' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('admin.students') }}">
+                            <i class="fas fa-user-graduate me-1 width-20"></i> <span>Students</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'admin.faculty' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('admin.faculty') }}">
+                            <i class="fas fa-chalkboard-user me-1 width-20"></i> <span>Faculty Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'admin.departments' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('admin.departments') }}">
+                            <i class="fas fa-sitemap me-1 width-20"></i> <span>Departments & Subjects</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'admin.settings' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('admin.settings') }}">
+                            <i class="fas fa-sliders me-1 width-20"></i> <span>College Settings</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user_role == 'student' %}
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold" style="font-size: 0.68rem;">Student Portal</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'student.dashboard' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('student.dashboard') }}">
+                            <i class="fas fa-chart-user me-1 width-20"></i> <span>My Attendance</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-label text-uppercase text-white-50 px-3 py-1 fw-bold mt-3" style="font-size: 0.68rem;">Account</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 rounded-3 px-3 py-2.5 d-flex align-items-center gap-3 {% if request.endpoint == 'auth.profile' %}active text-white bg-primary shadow-sm{% endif %}" href="{{ url_for('auth.profile') }}">
+                            <i class="fas fa-gear me-1 width-20"></i> <span>Profile & Security</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Page Content Wrapper -->
+        <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column min-vh-100">
+            
+            {% if current_user_role %}
+            <!-- Top Navigation Bar -->
+            <header class="top-navbar bg-body border-bottom sticky-top py-2 px-4 d-flex align-items-center justify-content-between shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light btn-sm rounded-circle border p-2" id="sidebar-toggle" title="Toggle Menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-none d-md-block text-muted small">
+                        <span class="badge bg-primary-subtle text-primary border me-2">{{ college_settings.academic_year }}</span>
+                        <span>{{ college_settings.semester }}</span>
+                    </div>
+                </div>
+
+                <!-- Right Top Controls -->
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Notifications Dropdown -->
+                    <div class="dropdown d-none d-sm-block">
+                        <button class="btn btn-light btn-sm rounded-circle border p-2 position-relative" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="width: 280px;">
+                            <li class="px-3 py-1 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="fw-bold small">System Alerts</span>
+                                <span class="badge bg-primary rounded-pill">Active</span>
+                            </li>
+                            <li><a class="dropdown-item small py-2 text-wrap" href="#"><i class="fas fa-info-circle text-primary me-2"></i> Attendance shortage alerts updated for students.</a></li>
+                            <li><a class="dropdown-item small py-2 text-wrap" href="#"><i class="fas fa-check-circle text-success me-2"></i> Academic Year {{ college_settings.academic_year }} active.</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-body dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="d-none d-md-block text-start lh-1">
+                                <div class="fw-semibold small">{{ current_user_name }}</div>
+                                <small class="text-muted text-capitalize" style="font-size: 0.72rem;">{{ current_user_role }}</small>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2">
+                            <li><a class="dropdown-item small py-2" href="{{ url_for('auth.profile') }}"><i class="fas fa-user-circle me-2 text-primary"></i> My Profile</a></li>
+                            {% if current_user_role == 'admin' %}
+                            <li><a class="dropdown-item small py-2" href="{{ url_for('admin.settings') }}"><i class="fas fa-sliders me-2 text-warning"></i> College Settings</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Sign Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+            {% endif %}
+
+            <!-- Main Content Area -->
+            <main class="container-fluid px-4 py-4 flex-grow-1">
+                <!-- Flash Notification Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="row">
+                            <div class="col-12">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3" role="alert">
+                                        {% if category == 'success' %}
+                                            <i class="fas fa-check-circle me-2"></i>
+                                        {% elif category == 'danger' %}
+                                            <i class="fas fa-triangle-exclamation me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-circle-info me-2"></i>
+                                        {% endif %}
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- SaaS Footer -->
+            <footer class="bg-body border-top py-3 px-4 text-center mt-auto">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-muted small">
+                    <div>&copy; {{ college_settings.academic_year }} <strong>{{ college_settings.college_name }}</strong>. All rights reserved.</div>
+                    <div>Principal: <strong>{{ college_settings.principal_name }}</strong> | {{ college_settings.semester }}</div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js 4.x -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

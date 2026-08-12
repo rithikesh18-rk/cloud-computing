@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{{ employee.full_name }} - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('employees.index') }}" class="text-secondary text-decoration-none small">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Employee Directory
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Header Card -->
+    <div class="col-12">
+        <div class="custom-card p-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                {% if employee.profile_image and employee.profile_image != 'default.jpg' %}
+                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + employee.profile_image) }}" class="rounded-circle me-4 shadow-sm" style="width: 84px; height: 84px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-primary text-white rounded-circle me-4 d-flex align-items-center justify-content-center fw-bold fs-2" style="width: 84px; height: 84px;">
+                        {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="d-flex align-items-center gap-3">
+                        <h2 class="fw-bold mb-0">{{ employee.full_name }}</h2>
+                        <span class="badge {% if employee.status == 'Active' %}badge-active{% else %}badge-terminated{% endif %}">
+                            {{ employee.status }}
+                        </span>
+                    </div>
+                    <p class="text-muted mb-0 fs-5">{{ employee.designation }} &bull; <span class="text-dark fw-medium">{{ employee.department.department_name if employee.department else 'Unassigned' }}</span></p>
+                    <small class="text-muted">Employee ID: <code class="fw-bold">{{ employee.employee_id }}</code></small>
+                </div>
+            </div>
+            {% if current_user.role == 'Admin' %}
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('employees.edit', id=employee.id) }}" class="btn btn-outline-primary px-3">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Profile
+                </a>
+                <form method="POST" action="{{ url_for('employees.delete', id=employee.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-delete-confirm">
+                        <i class="fa-solid fa-trash me-1"></i> Delete
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Personal & Contact Details -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fa-solid fa-id-card me-2 text-primary"></i>Personal Information</h5>
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <div class="text-muted small">Email Address</div>
+                    <div class="fw-semibold fs-6 text-primary">{{ employee.email }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Phone Number</div>
+                    <div class="fw-semibold fs-6">{{ employee.phone or 'Not provided' }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Gender</div>
+                    <div class="fw-semibold fs-6">{{ employee.gender or 'Not specified' }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Date of Birth</div>
+                    <div class="fw-semibold fs-6">{{ employee.date_of_birth.strftime('%B %d, %Y') if employee.date_of_birth else 'Not provided' }}</div>
+                </div>
+                <div class="col-12">
+                    <div class="text-muted small">Address</div>
+                    <div class="fw-semibold fs-6">
+                        {% if employee.address or employee.city %}
+                            {{ employee.address or '' }}{% if employee.city %}, {{ employee.city }}{% endif %}{% if employee.state %}, {{ employee.state }}{% endif %}{% if employee.country %}, {{ employee.country }}{% endif %}{% if employee.pincode %} - {{ employee.pincode }}{% endif %}
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employment & Compensation -->
+    <div class="col-lg-6">
+        <div class="custom-card p-4 h-100">
+            <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fa-solid fa-briefcase me-2 text-primary"></i>Employment & Attendance Metrics</h5>
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <div class="text-muted small">Department</div>
+                    <div class="fw-semibold fs-6">{{ employee.department.department_name if employee.department else 'Unassigned' }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Designation</div>
+                    <div class="fw-semibold fs-6">{{ employee.designation }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Joining Date</div>
+                    <div class="fw-semibold fs-6">{{ employee.joining_date.strftime('%B %d, %Y') }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Annual Compensation</div>
+                    <div class="fw-bold fs-5 text-success">${{ "{:,.2f}".format(employee.salary) }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Attendance Rate</div>
+                    <div class="fw-bold fs-5 text-primary">{{ employee.attendance_percentage }}%</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Total Attendance Logs</div>
+                    <div class="fw-bold fs-5 text-dark">{{ employee.attendances|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

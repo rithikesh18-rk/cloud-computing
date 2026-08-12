@@ -1,0 +1,65 @@
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, FloatField, DateField, SelectField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Email, Optional, ValidationError
+from app.models import Employee, Department
+from datetime import date
+
+class EmployeeForm(FlaskForm):
+    employee_id = StringField('Employee ID *', validators=[DataRequired()])
+    first_name = StringField('First Name *', validators=[DataRequired()])
+    last_name = StringField('Last Name *', validators=[DataRequired()])
+    email = StringField('Email Address *', validators=[DataRequired(), Email()])
+    phone = StringField('Phone Number', validators=[Optional()])
+    gender = SelectField('Gender', choices=[
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other')
+    ], validators=[Optional()])
+    date_of_birth = DateField('Date of Birth', validators=[Optional()])
+    address = TextAreaField('Address', validators=[Optional()])
+    city = StringField('City', validators=[Optional()])
+    state = StringField('State', validators=[Optional()])
+    country = StringField('Country', validators=[Optional()])
+    pincode = StringField('Pincode', validators=[Optional()])
+    
+    department_id = SelectField('Department *', coerce=int, validators=[DataRequired()])
+    designation = StringField('Designation / Job Title *', validators=[DataRequired()])
+    joining_date = DateField('Joining Date *', validators=[DataRequired()])
+    salary = FloatField('Annual Salary ($) *', validators=[DataRequired()])
+    status = SelectField('Employment Status *', choices=[
+        ('Active', 'Active'),
+        ('Inactive', 'Inactive')
+    ], default='Active', validators=[DataRequired()])
+    profile_image = FileField('Profile Image', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only (.jpg, .png, .jpeg, .gif)')
+    ])
+    submit = SubmitField('Save Employee')
+
+    def __init__(self, original_id=None, original_email=None, *args, **kwargs):
+        super(EmployeeForm, self).__init__(*args, **kwargs)
+        self.original_id = original_id
+        self.original_email = original_email
+        # Dynamically load departments
+        departments = Department.query.order_by(Department.department_name.asc()).all()
+        self.department_id.choices = [(d.id, d.department_name) for d in departments]
+
+    def validate_employee_id(self, employee_id):
+        if employee_id.data != self.original_id:
+            emp = Employee.query.filter_by(employee_id=employee_id.data).first()
+            if emp:
+                raise ValidationError('Employee ID already exists.')
+
+    def validate_email(self, email):
+        if email.data != self.original_email:
+            emp = Employee.query.filter_by(email=email.data).first()
+            if emp:
+                raise ValidationError('An employee with this email already exists.')
+
+    def validate_salary(self, salary):
+        if salary.data is not None and salary.data < 0:
+            raise ValidationError('Salary cannot be negative.')
+
+    def validate_joining_date(self, joining_date):
+        if joining_date.data and joining_date.data > date.today():
+            raise ValidationError('Joining date cannot be in the future.')

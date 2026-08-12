@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Mark Attendance - {{ college_settings.college_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h2 class="page-title"><i class="fas fa-check-double me-2 text-success"></i> Mark Attendance</h2>
+        <p class="page-subtitle mb-0">Select class details, load the student roster, and submit daily attendance records.</p>
+    </div>
+    <a href="{{ url_for('attendance.view_sessions') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-history me-1"></i> View Saved Logs
+    </a>
+</div>
+
+<!-- Class Selection Filter Card -->
+<div class="card card-custom p-4 mb-4">
+    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-filter text-primary me-2"></i> Class Selection Criteria</h5>
+
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Department *</label>
+            <select class="form-select form-select-custom" id="filter_department_id" name="department_id" required>
+                <option value="">-- Select Department --</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }} ({{ dept.code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Year *</label>
+            <select class="form-select form-select-custom" id="filter_year" name="year" required>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year" selected>2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Section *</label>
+            <select class="form-select form-select-custom" id="filter_section" name="section" required>
+                <option value="A" selected>Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Subject *</label>
+            <select class="form-select form-select-custom" id="filter_subject_id" name="subject_id" required>
+                <option value="">-- Select Subject --</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Date *</label>
+            <input type="date" class="form-control form-control-custom" id="filter_date" name="attendance_date" value="{{ today_date }}" required>
+        </div>
+
+        <div class="col-12 text-end pt-2">
+            <button type="button" class="btn btn-primary fw-semibold px-4 shadow-sm" id="btn_load_students">
+                <i class="fas fa-users me-1"></i> Load Student Roster
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Student Attendance Grid Form (Hidden until roster loaded) -->
+<div class="card card-custom p-4 d-none" id="student_list_container">
+    <form action="{{ url_for('attendance.mark') }}" method="POST">
+        <!-- Hidden input pass-throughs -->
+        <input type="hidden" id="hidden_dept" name="department_id">
+        <input type="hidden" id="hidden_year" name="year">
+        <input type="hidden" id="hidden_section" name="section">
+        <input type="hidden" id="hidden_subject" name="subject_id">
+        <input type="hidden" id="hidden_date" name="attendance_date">
+
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
+            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-list-ol text-success me-2"></i> Student Roster Grid</h5>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-success fw-semibold" id="btn_mark_all_present">
+                    <i class="fas fa-check-double me-1"></i> Mark All Present
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger fw-semibold" id="btn_mark_all_absent">
+                    <i class="fas fa-times-circle me-1"></i> Mark All Absent
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-custom align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 140px;">Roll Number</th>
+                        <th>Student Name</th>
+                        <th style="width: 200px;">Status</th>
+                        <th>Remarks / Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="student_table_body">
+                    <!-- Loaded via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success btn-lg fw-bold px-5 shadow">
+                <i class="fas fa-save me-2"></i> Save Attendance Record
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/attendance.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnLoad = document.getElementById('btn_load_students');
+
+    btnLoad.addEventListener('click', function() {
+        document.getElementById('hidden_dept').value = document.getElementById('filter_department_id').value;
+        document.getElementById('hidden_year').value = document.getElementById('filter_year').value;
+        document.getElementById('hidden_section').value = document.getElementById('filter_section').value;
+        document.getElementById('hidden_subject').value = document.getElementById('filter_subject_id').value;
+        document.getElementById('hidden_date').value = document.getElementById('filter_date').value;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Records - WorkPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Attendance Management</h2>
+        <p class="text-muted mb-0">Track employee check-in times and attendance logs.</p>
+    </div>
+    {% if current_user.role == 'Admin' %}
+    <a href="{{ url_for('attendance.add') }}" class="btn btn-primary px-3 py-2 fw-semibold">
+        <i class="fa-solid fa-calendar-plus me-1"></i> Mark Attendance
+    </a>
+    {% endif %}
+</div>
+
+<!-- Employee Attendance Summary Card if Employee role -->
+{% if current_user.role == 'Employee' %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-icon green">
+                <i class="fa-solid fa-percent"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">Overall Attendance Rate</div>
+                <div class="fs-3 fw-bold">{{ percentage }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Filters -->
+<div class="custom-card p-3 mb-4">
+    <form method="GET" action="{{ url_for('attendance.index') }}" class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <input type="date" name="date" class="form-control" value="{{ date_filter }}" placeholder="Filter by date">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-dark w-100 fw-semibold">Filter Date</button>
+            {% if date_filter %}
+                <a href="{{ url_for('attendance.index') }}" class="btn btn-outline-secondary" title="Clear Filter"><i class="fa-solid fa-rotate-left"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Attendance Table -->
+<div class="custom-card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table custom-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Employee Name</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Hours Worked</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                    {% if current_user.role == 'Admin' %}
+                    <th class="text-end">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if attendances %}
+                    {% for att in attendances %}
+                        <tr>
+                            <td class="fw-semibold">{{ att.attendance_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="fw-semibold text-dark">{{ att.employee.full_name }}</div>
+                                <div class="text-muted extra-small" style="font-size: 0.8rem;">ID: {{ att.employee.employee_id }}</div>
+                            </td>
+                            <td>{{ att.check_in.strftime('%H:%M') if att.check_in else '--:--' }}</td>
+                            <td>{{ att.check_out.strftime('%H:%M') if att.check_out else '--:--' }}</td>
+                            <td class="fw-semibold">{{ att.worked_hours }} hrs</td>
+                            <td>
+                                <span class="badge {% if att.status == 'Present' %}badge-active{% elif att.status == 'Half Day' or att.status == 'Late' %}badge-leave{% else %}badge-terminated{% endif %}">
+                                    {{ att.status }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{{ att.remarks or '-' }}</td>
+                            {% if current_user.role == 'Admin' %}
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('attendance.edit', id=att.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('attendance.delete', id=att.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-confirm ms-1" title="Delete">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-calendar-xmark fa-3x mb-3 opacity-25"></i>
+                            <h5>No Attendance Logs Found</h5>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
