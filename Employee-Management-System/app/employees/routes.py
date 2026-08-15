@@ -10,51 +10,66 @@ from app.auth.decorators import admin_required
 @employees_bp.route('/')
 @login_required
 def index():
-    search_query = request.args.get('search', '', type=str)
-    department_filter = request.args.get('department', '', type=str)
-    status_filter = request.args.get('status', '', type=str)
-    page = request.args.get('page', 1, type=int)
+    try:
+        search_query = request.args.get('search', '', type=str)
+        department_filter = request.args.get('department', '', type=str)
+        status_filter = request.args.get('status', '', type=str)
+        page = request.args.get('page', 1, type=int)
 
-    query = Employee.query
+        query = Employee.query
 
-    if search_query:
-        query = query.filter(
-            (Employee.first_name.ilike(f'%{search_query}%')) |
-            (Employee.last_name.ilike(f'%{search_query}%')) |
-            (Employee.email.ilike(f'%{search_query}%')) |
-            (Employee.employee_id.ilike(f'%{search_query}%')) |
-            (Employee.designation.ilike(f'%{search_query}%'))
+        if search_query:
+            query = query.filter(
+                (Employee.first_name.ilike(f'%{search_query}%')) |
+                (Employee.last_name.ilike(f'%{search_query}%')) |
+                (Employee.email.ilike(f'%{search_query}%')) |
+                (Employee.employee_id.ilike(f'%{search_query}%')) |
+                (Employee.designation.ilike(f'%{search_query}%'))
+            )
+
+        if department_filter:
+            query = query.join(Department).filter(Department.department_name == department_filter)
+
+        if status_filter:
+            query = query.filter(Employee.status == status_filter)
+
+        pagination = query.order_by(Employee.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
+        employees = pagination.items
+        try:
+            departments = Department.query.order_by(Department.department_name.asc()).all()
+        except Exception:
+            db.session.rollback()
+            departments = []
+        statuses = ['Active', 'Inactive']
+
+        return render_template(
+            'employees/index.html',
+            employees=employees,
+            pagination=pagination,
+            search_query=search_query,
+            department_filter=department_filter,
+            status_filter=status_filter,
+            departments=departments,
+            statuses=statuses
         )
-
-    if department_filter:
-        query = query.join(Department).filter(Department.department_name == department_filter)
-
-    if status_filter:
-        query = query.filter(Employee.status == status_filter)
-
-    pagination = query.order_by(Employee.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
-    employees = pagination.items
-    departments = Department.query.order_by(Department.department_name.asc()).all()
-    statuses = ['Active', 'Inactive']
-
-    return render_template(
-        'employees/index.html',
-        employees=employees,
-        pagination=pagination,
-        search_query=search_query,
-        department_filter=department_filter,
-        status_filter=status_filter,
-        departments=departments,
-        statuses=statuses
-    )
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An unexpected error occurred: {str(e)}', 'danger')
+        return render_template('employees/index.html', employees=[], pagination=None, search_query='', department_filter='', status_filter='', departments=[], statuses=['Active', 'Inactive'])
 
 @employees_bp.route('/add', methods=['GET', 'POST'])
 @admin_required
 def add():
     try:
-        departments = Department.query.order_by(Department.department_name.asc()).all()
+        try:
+            departments = Department.query.order_by(Department.department_name.asc()).all()
+            choices = [(0, 'Select Department')] + [(d.id, d.department_name) for d in departments]
+        except Exception:
+            db.session.rollback()
+            choices = [(0, 'Select Department')]
+
         form = EmployeeForm()
-        form.department_id.choices = [(0, 'Select Department')] + [(d.id, d.department_name) for d in departments]
+        form.department_id.choices = choices
 
         if form.validate_on_submit():
             picture_file = 'default.jpg'
@@ -62,7 +77,6 @@ def add():
                 picture_file = save_profile_picture(form.profile_image.data)
 
             dept_id = form.department_id.data if form.department_id.data and form.department_id.data != 0 else None
-
 
             employee = Employee(
                 employee_id=form.employee_id.data.strip().upper(),
@@ -80,7 +94,7 @@ def add():
                 department_id=dept_id,
                 designation=form.designation.data.strip(),
                 joining_date=form.joining_date.data,
-                salary=form.salary.data,
+                salary=form.salary.data if form.salary.data is not None else 0.0,
                 status=form.status.data,
                 profile_image=picture_file
             )
@@ -97,6 +111,7 @@ def add():
         db.session.rollback()
         flash(f'An unexpected error occurred: {str(e)}', 'danger')
         return redirect(url_for('employees.index'))
+
 
 @employees_bp.route('/<int:id>')
 @login_required

@@ -1,59 +1,38 @@
 import sys, os, time, re, random
-import urllib.request
-import urllib.parse
-import http.cookiejar
+import requests
 
 BASE_URL = "https://employee-management-system-bv3y.onrender.com"
 
-class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
+session = requests.Session()
+session.headers.update({"User-Agent": "Mozilla/5.0"})
 
-cookie_jar = http.cookiejar.CookieJar()
-opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar), NoRedirectHandler())
+res_login_page = session.get(f"{BASE_URL}/auth/login", timeout=30)
+login_html = res_login_page.text
 
-print(f"=== Live Diagnostic (No Redirect) on {BASE_URL} ===")
-
-# Step 1: Login
-req_login_page = urllib.request.Request(f"{BASE_URL}/auth/login", headers={"User-Agent": "Mozilla/5.0"})
-res_login_page = opener.open(req_login_page, timeout=30)
-login_html = res_login_page.read().decode('utf-8', errors='ignore')
-
-csrf_match = re.search(r'name="csrf_token"\s+type="hidden"\s+value="([^"]+)"', login_html)
+csrf_match = re.search(r'name="csrf_token".*?value="([^"]+)"', login_html, re.DOTALL) or re.search(r'value="([^"]+)".*?name="csrf_token"', login_html, re.DOTALL)
 csrf_token = csrf_match.group(1) if csrf_match else None
 
-login_data = {"username": "admin", "password": "admin123"}
+login_payload = {"username": "admin", "password": "admin123"}
 if csrf_token:
-    login_data["csrf_token"] = csrf_token
+    login_payload["csrf_token"] = csrf_token
 
-req_login = urllib.request.Request(f"{BASE_URL}/auth/login", data=urllib.parse.urlencode(login_data).encode('utf-8'), headers={"User-Agent": "Mozilla/5.0"})
-try:
-    res_login = opener.open(req_login, timeout=30)
-    print(f"[1] Login Response Code: {res_login.getcode()} (Location: {res_login.headers.get('Location')})")
-except urllib.error.HTTPError as e:
-    print(f"[1] Login Response Code: {e.code} (Location: {e.headers.get('Location')})")
+session.post(f"{BASE_URL}/auth/login", data=login_payload, timeout=30)
 
-# Step 2: GET /employees/add
-req_add = urllib.request.Request(f"{BASE_URL}/employees/add", headers={"User-Agent": "Mozilla/5.0"})
-res_add = opener.open(req_add, timeout=30)
-add_html = res_add.read().decode('utf-8', errors='ignore')
-print(f"[2] GET /employees/add Status: {res_add.getcode()}")
+res_add_page = session.get(f"{BASE_URL}/employees/add", timeout=30)
+add_html = res_add_page.text
 
-add_csrf_match = re.search(r'name="csrf_token"\s+type="hidden"\s+value="([^"]+)"', add_html)
+add_csrf_match = re.search(r'name="csrf_token".*?value="([^"]+)"', add_html, re.DOTALL) or re.search(r'value="([^"]+)".*?name="csrf_token"', add_html, re.DOTALL)
 add_csrf = add_csrf_match.group(1) if add_csrf_match else csrf_token
 
 dept_options = re.findall(r'<option\s+value="(\d+)">([^<]+)</option>', add_html)
-print(f" -> Rendered Department Options: {dept_options}")
 dept_id = dept_options[0][0] if dept_options else "1"
 
-# Step 3: POST /employees/add
-emp_id = f"EMP{random.randint(1000, 9999)}"
-emp_email = f"john.{emp_id.lower()}@company.com"
+emp_code = f"EMP{random.randint(1000, 9999)}"
+emp_email = f"john.{emp_code.lower()}@company.com"
 
-print(f"\n[3] Submitting POST /employees/add ({emp_id})...")
-emp_form = {
+emp_payload = {
     "csrf_token": add_csrf,
-    "employee_id": emp_id,
+    "employee_id": emp_code,
     "first_name": "John",
     "last_name": "Doe",
     "email": emp_email,
@@ -67,14 +46,7 @@ emp_form = {
     "submit": "Save Employee"
 }
 
-try:
-    req_post = urllib.request.Request(f"{BASE_URL}/employees/add", data=urllib.parse.urlencode(emp_form).encode('utf-8'), headers={
-        "User-Agent": "Mozilla/5.0",
-        "Content-Type": "application/x-www-form-urlencoded"
-    })
-    res_post = opener.open(req_post, timeout=30)
-    print(f" -> POST Response Code: {res_post.getcode()} (Location: {res_post.headers.get('Location')})")
-except urllib.error.HTTPError as e:
-    print(f" -> POST Response Code: {e.code} (Location: {e.headers.get('Location')})")
-    body = e.read().decode('utf-8', errors='ignore')
-    print(" -> Response Error Body:\n", body[:600])
+res_add_post = session.post(f"{BASE_URL}/employees/add", data=emp_payload, timeout=30)
+print(f"POST /employees/add Status: {res_add_post.status_code}")
+pres = re.findall(r'<pre.*?>(.*?)</pre>', res_add_post.text, re.DOTALL)
+print("Extracted pre blocks:\n", pres)
