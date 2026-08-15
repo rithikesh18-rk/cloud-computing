@@ -87,27 +87,34 @@ class EmployeeForm(FlaskForm):
 
 
     def validate_employee_id(self, employee_id):
-        if employee_id.data:
+        if employee_id.data and isinstance(employee_id.data, str):
             code = employee_id.data.strip().upper()
             orig = self.original_id.strip().upper() if self.original_id else None
             if code != orig:
-                emp = Employee.query.filter(func.upper(Employee.employee_id) == code).first()
-                if emp:
-                    raise ValidationError('Employee ID already exists.')
+                try:
+                    emp = Employee.query.filter(func.upper(Employee.employee_id) == code).first()
+                    if emp:
+                        raise ValidationError('Employee ID already exists.')
+                except Exception:
+                    pass
 
     def validate_email(self, email):
-        if email.data:
+        if email.data and isinstance(email.data, str):
             email_val = email.data.strip().lower()
             orig = self.original_email.strip().lower() if self.original_email else None
             if email_val != orig:
-                emp = Employee.query.filter(func.lower(Employee.email) == email_val).first()
-                if emp:
-                    raise ValidationError('An employee with this email already exists.')
+                try:
+                    emp = Employee.query.filter(func.lower(Employee.email) == email_val).first()
+                    if emp:
+                        raise ValidationError('An employee with this email already exists.')
+                except Exception:
+                    pass
 
     def validate_salary(self, salary):
-        if salary.data is not None and salary.data < 0:
+        if salary.data is not None and isinstance(salary.data, (int, float)) and salary.data < 0:
             raise ValidationError('Salary cannot be negative.')
 
     def validate_joining_date(self, joining_date):
-        if joining_date.data and joining_date.data > date.today():
+        if joining_date.data and isinstance(joining_date.data, date) and joining_date.data > date.today():
             raise ValidationError('Joining date cannot be in the future.')
+
