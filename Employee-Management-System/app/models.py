@@ -284,6 +284,23 @@ def init_database(app=None):
                 db.session.rollback()
                 print(f" -> [init_database] Warning: Admin creation failed: {e}")
 
+        # Auto-seed default departments if empty
+        try:
+            if Department.query.count() == 0:
+                default_depts = [
+                    Department(department_name='Engineering & Tech', department_code='ENG', description='Software Engineering & Technology'),
+                    Department(department_name='Human Resources', department_code='HR', description='People & Talent Operations'),
+                    Department(department_name='Finance & Accounting', department_code='FIN', description='Financial Planning & Accounting'),
+                    Department(department_name='Marketing & Growth', department_code='MKT', description='Marketing, PR & Brand Growth')
+                ]
+                db.session.add_all(default_depts)
+                db.session.commit()
+                print(" -> [init_database] Default departments auto-seeded: ENG, HR, FIN, MKT.")
+        except Exception as e:
+            db.session.rollback()
+            print(f" -> [init_database] Warning: Department auto-seed failed: {e}")
+
+
     if app:
         with app.app_context():
             _do_init()

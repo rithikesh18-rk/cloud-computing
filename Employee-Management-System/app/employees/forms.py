@@ -6,6 +6,14 @@ from sqlalchemy import func
 from app.models import Employee, Department
 from datetime import date
 
+def safe_coerce(val):
+    if val is None or val == '' or val == 'None' or val == '0':
+        return 0
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return 0
+
 class EmployeeForm(FlaskForm):
     employee_id = StringField('Employee ID *', validators=[DataRequired()])
     first_name = StringField('First Name *', validators=[DataRequired()])
@@ -24,7 +32,7 @@ class EmployeeForm(FlaskForm):
     country = StringField('Country', validators=[Optional()])
     pincode = StringField('Pincode', validators=[Optional()])
     
-    department_id = SelectField('Department *', coerce=int, validators=[DataRequired()])
+    department_id = SelectField('Department', coerce=safe_coerce, validators=[Optional()])
     designation = StringField('Designation / Job Title *', validators=[DataRequired()])
     joining_date = DateField('Joining Date *', validators=[DataRequired()])
     salary = FloatField('Annual Salary ($) *', validators=[DataRequired()])
@@ -41,9 +49,12 @@ class EmployeeForm(FlaskForm):
         super(EmployeeForm, self).__init__(*args, **kwargs)
         self.original_id = original_id
         self.original_email = original_email
-        # Dynamically load departments
-        departments = Department.query.order_by(Department.department_name.asc()).all()
-        self.department_id.choices = [(d.id, d.department_name) for d in departments]
+        try:
+            departments = Department.query.order_by(Department.department_name.asc()).all()
+            self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.department_name) for d in departments]
+        except Exception:
+            self.department_id.choices = [(0, 'Select Department')]
+
 
     def validate_employee_id(self, employee_id):
         if employee_id.data:
