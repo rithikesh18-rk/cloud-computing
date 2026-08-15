@@ -13,19 +13,25 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password.', 'danger')
+        try:
+            user = User.query.filter_by(username=form.username.data.strip()).first()
+            if user is None or not user.check_password(form.password.data):
+                flash('Invalid username or password.', 'danger')
+                return redirect(url_for('auth.login'))
+            
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            if not next_page or urlparse(next_page).netloc != '':
+                next_page = url_for('dashboard.index')
+            flash(f'Welcome back, {user.username}!', 'success')
+            return redirect(next_page)
+        except Exception as e:
+            db.session.rollback()
+            flash('A database connection error occurred during login. Please try logging in again.', 'danger')
             return redirect(url_for('auth.login'))
         
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or urlparse(next_page).netloc != '':
-            next_page = url_for('dashboard.index')
-        flash(f'Welcome back, {user.username}!', 'success')
-        return redirect(next_page)
-        
     return render_template('auth/login.html', form=form)
+
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():

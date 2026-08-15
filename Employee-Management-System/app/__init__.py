@@ -47,8 +47,10 @@ def create_app(config_class=Config):
         db.session.rollback()
         return render_template('errors/500.html'), 500
 
-    # Initialize database tables and seed default admin account
-    from app.models import init_database
-    init_database(app)
+    # Initialize database tables and seed default admin account inside app context
+    with app.app_context():
+        from app.models import init_database
+        init_database()
 
     return app
+
