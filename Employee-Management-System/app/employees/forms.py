@@ -7,16 +7,33 @@ from app.models import Employee, Department
 from datetime import date, datetime
 
 class SafeDateField(DateField):
-    """Subclass of DateField that safely handles str vs date objects in _value() without raising AttributeError."""
+    """Subclass of DateField that safely handles str vs date objects and multiple date formats without raising exceptions."""
+    def __init__(self, label=None, validators=None, format='%Y-%m-%d', **kwargs):
+        super(SafeDateField, self).__init__(label, validators, format=format, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            date_str = ' '.join(valuelist).strip()
+            if not date_str:
+                self.data = None
+                return
+            for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d'):
+                try:
+                    self.data = datetime.strptime(date_str, fmt).date()
+                    return
+                except ValueError:
+                    pass
+            self.data = None
+
     def _value(self):
         if self.raw_data:
             return ' '.join(self.raw_data)
         if self.data:
             if isinstance(self.data, (date, datetime)):
-                fmt = self.format[0] if isinstance(self.format, (list, tuple)) else self.format
-                return self.data.strftime(fmt)
+                return self.data.strftime('%Y-%m-%d')
             return str(self.data)
         return ''
+
 
 def safe_coerce(val):
     if val is None or val == '' or val == 'None' or val == '0':
