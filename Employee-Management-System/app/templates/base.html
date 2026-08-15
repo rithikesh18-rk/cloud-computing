@@ -27,35 +27,36 @@
         <hr class="text-secondary opacity-25">
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('employees.index') }}" class="nav-link {% if 'employees' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('employees.index') }}" class="nav-link {% if request.endpoint and 'employees' in request.endpoint %}active{% endif %}">
                     <i class="fa-solid fa-user-group"></i> Employees
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('departments.index') }}" class="nav-link {% if 'departments' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('departments.index') }}" class="nav-link {% if request.endpoint and 'departments' in request.endpoint %}active{% endif %}">
                     <i class="fa-solid fa-sitemap"></i> Departments
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('attendance.index') }}" class="nav-link {% if 'attendance' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('attendance.index') }}" class="nav-link {% if request.endpoint and 'attendance' in request.endpoint %}active{% endif %}">
                     <i class="fa-solid fa-calendar-check"></i> Attendance
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('leave.index') }}" class="nav-link {% if 'leave' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('leave.index') }}" class="nav-link {% if request.endpoint and 'leave' in request.endpoint %}active{% endif %}">
                     <i class="fa-solid fa-plane-departure"></i> Leave Requests
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('profile.index') }}" class="nav-link {% if 'profile' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('profile.index') }}" class="nav-link {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
                     <i class="fa-solid fa-id-card"></i> My Profile
                 </a>
             </li>
+
         </ul>
         <hr class="text-secondary opacity-25">
         <div class="dropdown px-2">
