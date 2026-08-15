@@ -42,10 +42,15 @@ def create_app(config_class=Config):
     def not_found_error(error):
         return render_template('errors/404.html'), 404
 
-    @app.errorhandler(500)
-    def internal_error(error):
+    @app.errorhandler(Exception)
+    def handle_all_exceptions(e):
         db.session.rollback()
-        return render_template('errors/500.html'), 500
+        import traceback
+        tb = traceback.format_exc()
+        code = getattr(e, 'code', 500)
+        status_code = code if isinstance(code, int) and 100 <= code <= 599 else 500
+        return f"<h1>Diagnostic Error ({status_code})</h1><p><b>{type(e).__name__}:</b> {str(e)}</p><pre>{tb}</pre>", status_code
+
 
 
 
