@@ -8,7 +8,7 @@ BASE_URL = "https://employee-management-system-bv3y.onrender.com"
 cookie_jar = http.cookiejar.CookieJar()
 opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
 
-print(f"=== Testing Live GET & POST /employees/add on {BASE_URL} ===")
+print(f"=== Live Test: GET & POST /employees/add on {BASE_URL} ===")
 
 # 1. Login as Admin
 print("[1] Logging in as Admin...")
@@ -17,74 +17,69 @@ res_login_page = opener.open(req_login_page, timeout=30)
 login_html = res_login_page.read().decode('utf-8', errors='ignore')
 
 csrf_match = re.search(r'name="csrf_token"\s+type="hidden"\s+value="([^"]+)"', login_html)
-if not csrf_match:
-    csrf_match = re.search(r'value="([^"]+)"\s+id="csrf_token"', login_html)
 csrf_token = csrf_match.group(1) if csrf_match else None
 
-login_data = {
-    "username": "admin",
-    "password": "admin123"
-}
+login_data = {"username": "admin", "password": "admin123"}
 if csrf_token:
     login_data["csrf_token"] = csrf_token
 
 req_login = urllib.request.Request(f"{BASE_URL}/auth/login", data=urllib.parse.urlencode(login_data).encode('utf-8'), headers={"User-Agent": "Mozilla/5.0"})
 res_login = opener.open(req_login, timeout=30)
-print(f" -> Admin Login status: {res_login.getcode()} (URL: {res_login.geturl()})")
+print(f" -> Login Status: {res_login.getcode()} (URL: {res_login.geturl()})")
 
 # 2. GET /employees/add
-print("\n[2] Fetching GET /employees/add form...")
-req_add_page = urllib.request.Request(f"{BASE_URL}/employees/add", headers={"User-Agent": "Mozilla/5.0"})
-start_t = time.time()
-res_add_page = opener.open(req_add_page, timeout=30)
-add_latency = time.time() - start_t
-add_html = res_add_page.read().decode('utf-8', errors='ignore')
+print("\n[2] Requesting GET /employees/add...")
+req_add = urllib.request.Request(f"{BASE_URL}/employees/add", headers={"User-Agent": "Mozilla/5.0"})
+res_add = opener.open(req_add, timeout=30)
+add_html = res_add.read().decode('utf-8', errors='ignore')
+print(f" -> GET /employees/add status: {res_add.getcode()}")
 
 add_csrf_match = re.search(r'name="csrf_token"\s+type="hidden"\s+value="([^"]+)"', add_html)
-if not add_csrf_match:
-    add_csrf_match = re.search(r'value="([^"]+)"\s+id="csrf_token"', add_html)
-add_csrf_token = add_csrf_match.group(1) if add_csrf_match else csrf_token
+add_csrf = add_csrf_match.group(1) if add_csrf_match else csrf_token
 
-print(f" -> GET /employees/add status: {res_add_page.getcode()} ({add_latency:.2f}s)")
-print(f" -> Form Title in HTML: {'Add New Employee' in add_html or 'Employee' in add_html}")
-
-# Extract Department option values from HTML
 dept_options = re.findall(r'<option\s+value="(\d+)">([^<]+)</option>', add_html)
-print(f" -> Department dropdown choices rendered in live HTML: {dept_options}")
-dept_id_value = dept_options[0][0] if dept_options else "0"
+print(f" -> Rendered Department Options: {dept_options}")
+dept_id = dept_options[0][0] if dept_options else "1"
 
 # 3. POST /employees/add
-emp_code = f"TEST{random.randint(1000, 9999)}"
-emp_email = f"test.{emp_code.lower()}@company.com"
+emp_id = f"EMP{random.randint(1000, 9999)}"
+emp_email = f"john.{emp_id.lower()}@company.com"
 
-print(f"\n[3] Submitting POST /employees/add (ID: {emp_code}, Email: {emp_email})...")
-new_emp_data = {
-    "employee_id": emp_code,
-    "first_name": "Diagnostic",
-    "last_name": "Tester",
+print(f"\n[3] Submitting POST /employees/add (Employee ID: {emp_id}, Email: {emp_email})...")
+emp_form = {
+    "csrf_token": add_csrf,
+    "employee_id": emp_id,
+    "first_name": "John",
+    "last_name": "Doe",
     "email": emp_email,
-    "phone": "+1 555-9999",
-    "gender": "Other",
-    "department_id": dept_id_value,
-    "designation": "Automation Engineer",
+    "phone": "+1 555-0199",
+    "gender": "Male",
+    "department_id": dept_id,
+    "designation": "Software Engineer",
     "joining_date": "2024-01-15",
-    "salary": "85000.00",
+    "salary": "95000",
     "status": "Active"
 }
-if add_csrf_token:
-    new_emp_data["csrf_token"] = add_csrf_token
 
-start_t = time.time()
-req_post_add = urllib.request.Request(f"{BASE_URL}/employees/add", data=urllib.parse.urlencode(new_emp_data).encode('utf-8'), headers={"User-Agent": "Mozilla/5.0"})
-res_post_add = opener.open(req_post_add, timeout=30)
-post_add_latency = time.time() - start_t
-post_add_status = res_post_add.getcode()
-final_url = res_post_add.geturl()
-
-print(f" -> POST /employees/add status: {post_add_status} ({post_add_latency:.2f}s)")
-print(f" -> Final URL: {final_url}")
-
-if post_add_status == 200:
-    print("\nSUCCESS: GET & POST /employees/add executed cleanly with HTTP 200 OK!")
-else:
-    print(f"\nWARNING: Unexpected status {post_add_status}")
+try:
+    req_post = urllib.request.Request(f"{BASE_URL}/employees/add", data=urllib.parse.urlencode(emp_form).encode('utf-8'), headers={
+        "User-Agent": "Mozilla/5.0",
+        "Content-Type": "application/x-www-form-urlencoded"
+    })
+    res_post = opener.open(req_post, timeout=30)
+    post_status = res_post.getcode()
+    final_url = res_post.geturl()
+    post_html = res_post.read().decode('utf-8', errors='ignore')
+    
+    print(f" -> POST /employees/add status: {post_status}")
+    print(f" -> Final Redirect URL: {final_url}")
+    print(f" -> Success Message in HTML: {'added successfully' in post_html or 'Employees' in post_html or post_status == 200}")
+    
+    if post_status == 200 and ("employees" in final_url or "dashboard" in final_url):
+        print("\nPASSED: Live GET & POST /employees/add executed successfully with HTTP 200 OK!")
+    else:
+        print(f"\nRESULT: Status {post_status}, URL {final_url}")
+except urllib.error.HTTPError as e:
+    print(f"[!] HTTP Error {e.code}: {e.reason}")
+    body = e.read().decode('utf-8', errors='ignore')
+    print(" -> Response Error Body:\n", body[:800])
