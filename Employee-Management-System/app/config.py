@@ -25,6 +25,7 @@ class Config:
     """Base application configuration with dual MySQL & SQLite fallback support."""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'workpulse-production-secure-fallback-key-2026'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = get_db_uri()
     
     # Connection pool options for MySQL resilience
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -32,9 +33,6 @@ class Config:
         'pool_recycle': 280
     }
 
-    @property
-    def SQLALCHEMY_DATABASE_URI(self):
-        return get_db_uri()
 
 
 
