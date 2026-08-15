@@ -53,7 +53,7 @@ class EmployeeForm(FlaskForm):
         ('Male', 'Male'),
         ('Female', 'Female'),
         ('Other', 'Other')
-    ], validators=[Optional()])
+    ], validate_choice=False, validators=[Optional()])
     date_of_birth = SafeDateField('Date of Birth', validators=[Optional()])
     address = TextAreaField('Address', validators=[Optional()])
     city = StringField('City', validators=[Optional()])
@@ -61,7 +61,7 @@ class EmployeeForm(FlaskForm):
     country = StringField('Country', validators=[Optional()])
     pincode = StringField('Pincode', validators=[Optional()])
     
-    department_id = SelectField('Department', coerce=safe_coerce, validators=[Optional()])
+    department_id = SelectField('Department', coerce=safe_coerce, validate_choice=False, validators=[Optional()])
     designation = StringField('Designation / Job Title *', validators=[DataRequired()])
     joining_date = SafeDateField('Joining Date *', validators=[DataRequired()])
 
@@ -69,7 +69,7 @@ class EmployeeForm(FlaskForm):
     status = SelectField('Employment Status *', choices=[
         ('Active', 'Active'),
         ('Inactive', 'Inactive')
-    ], default='Active', validators=[DataRequired()])
+    ], default='Active', validate_choice=False, validators=[DataRequired()])
     profile_image = FileField('Profile Image', validators=[
         FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only (.jpg, .png, .jpeg, .gif)')
     ])
