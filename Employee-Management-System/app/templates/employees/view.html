@@ -101,7 +101,8 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="text-muted small">Annual Compensation</div>
-                    <div class="fw-bold fs-5 text-success">${{ "{:,.2f}".format(employee.salary) }}</div>
+                    <div class="fw-bold fs-5 text-success">${{ "{:,.2f}".format(employee.salary or 0.0) }}</div>
+
                 </div>
                 <div class="col-sm-6">
                     <div class="text-muted small">Attendance Rate</div>

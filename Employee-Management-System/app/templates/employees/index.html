@@ -95,7 +95,8 @@
                                     {{ emp.status }}
                                 </span>
                             </td>
-                            <td class="fw-semibold">${{ "{:,.2f}".format(emp.salary) }}</td>
+                            <td class="fw-semibold">${{ "{:,.2f}".format(emp.salary or 0.0) }}</td>
+
                             <td class="text-end">
                                 <div class="btn-group">
                                     <a href="{{ url_for('employees.view', id=emp.id) }}" class="btn btn-sm btn-outline-primary" title="View Profile">
