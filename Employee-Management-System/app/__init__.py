@@ -45,7 +45,10 @@ def create_app(config_class=Config):
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
-        return render_template('errors/500.html'), 500
+        import traceback
+        tb = traceback.format_exc()
+        return f"<h1>500 Error Diagnostic</h1><pre>{tb}</pre><hr><p>{str(error)}</p>", 500
+
 
     # Initialize database tables and seed default admin account inside app context
     with app.app_context():
