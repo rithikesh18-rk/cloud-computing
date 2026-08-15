@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from datetime import date
 from app.attendance import attendance_bp
 from app.attendance.forms import AttendanceForm
-from app.models import Attendance, Employee
+from app.models import Attendance, Employee, safe_commit
 from app.extensions import db
 from app.auth.decorators import admin_required
 
@@ -19,7 +19,7 @@ def index():
         emp = current_user.employee
         if not emp:
             flash('No associated employee record found for your user account.', 'warning')
-            return render_template('attendance/index.html', attendances=[], percentage=100.0)
+            return render_template('attendance/index.html', attendances=[], percentage=100.0, date_filter=date_filter)
         query = query.filter_by(employee_id=emp.id)
 
     if date_filter:
@@ -60,12 +60,15 @@ def add():
             check_in=form.check_in.data,
             check_out=form.check_out.data,
             status=form.status.data,
-            remarks=form.remarks.data
+            remarks=form.remarks.data.strip() if form.remarks.data else None
         )
         db.session.add(att)
-        db.session.commit()
-        flash('Attendance record saved successfully!', 'success')
-        return redirect(url_for('attendance.index'))
+        success, error_msg = safe_commit()
+        if success:
+            flash('Attendance record saved successfully!', 'success')
+            return redirect(url_for('attendance.index'))
+        else:
+            flash(f'Failed to save attendance: {error_msg}', 'danger')
 
     return render_template('attendance/add_edit.html', form=form, title='Mark Attendance', is_edit=False)
 
@@ -77,15 +80,29 @@ def edit(id):
     form.set_employee_choices()
 
     if form.validate_on_submit():
+        # Check if record for this date and employee already exists (excluding current record)
+        existing = Attendance.query.filter(
+            Attendance.employee_id == form.employee_id.data,
+            Attendance.attendance_date == form.attendance_date.data,
+            Attendance.id != id
+        ).first()
+        if existing:
+            flash('An attendance record already exists for this employee on the selected date.', 'danger')
+            return render_template('attendance/add_edit.html', form=form, title='Edit Attendance Record', is_edit=True, att=att)
+
         att.employee_id = form.employee_id.data
         att.attendance_date = form.attendance_date.data
         att.check_in = form.check_in.data
         att.check_out = form.check_out.data
         att.status = form.status.data
-        att.remarks = form.remarks.data
-        db.session.commit()
-        flash('Attendance record updated successfully!', 'success')
-        return redirect(url_for('attendance.index'))
+        att.remarks = form.remarks.data.strip() if form.remarks.data else None
+
+        success, error_msg = safe_commit()
+        if success:
+            flash('Attendance record updated successfully!', 'success')
+            return redirect(url_for('attendance.index'))
+        else:
+            flash(f'Failed to update attendance: {error_msg}', 'danger')
 
     return render_template('attendance/add_edit.html', form=form, title='Edit Attendance Record', is_edit=True, att=att)
 
@@ -94,6 +111,10 @@ def edit(id):
 def delete(id):
     att = Attendance.query.get_or_404(id)
     db.session.delete(att)
-    db.session.commit()
-    flash('Attendance record deleted successfully.', 'info')
+    success, error_msg = safe_commit()
+    if success:
+        flash('Attendance record deleted successfully.', 'info')
+    else:
+        flash(f'Failed to delete attendance: {error_msg}', 'danger')
     return redirect(url_for('attendance.index'))
+

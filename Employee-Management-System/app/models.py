@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.extensions import db, login_manager
@@ -37,8 +38,10 @@ class User(UserMixin, db.Model):
 
     @property
     def employee(self):
-        """Finds associated Employee profile by matching email."""
-        return Employee.query.filter_by(email=self.email).first()
+        """Finds associated Employee profile by matching email (case-insensitive)."""
+        if not self.email:
+            return None
+        return Employee.query.filter(func.lower(Employee.email) == func.lower(self.email.strip())).first()
 
     def __repr__(self):
         return f'<User {self.username} (Role: {self.role})>'

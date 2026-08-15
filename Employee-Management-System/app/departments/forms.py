@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
+from sqlalchemy import func
 from app.models import Department
 
 class DepartmentForm(FlaskForm):
@@ -14,7 +15,11 @@ class DepartmentForm(FlaskForm):
         self.original_code = original_code
 
     def validate_department_code(self, department_code):
-        if department_code.data != self.original_code:
-            dept = Department.query.filter_by(department_code=department_code.data).first()
-            if dept:
-                raise ValidationError('Department code already exists.')
+        if department_code.data:
+            code = department_code.data.strip().upper()
+            orig = self.original_code.strip().upper() if self.original_code else None
+            if code != orig:
+                dept = Department.query.filter(func.upper(Department.department_code) == code).first()
+                if dept:
+                    raise ValidationError('Department code already exists.')
+

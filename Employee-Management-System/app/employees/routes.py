@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from app.employees import employees_bp
 from app.employees.forms import EmployeeForm
-from app.models import Employee, Department
+from app.models import Employee, Department, safe_commit
 from app.extensions import db
 from app.utils import save_profile_picture
 from app.auth.decorators import admin_required
@@ -58,29 +58,32 @@ def add():
             picture_file = save_profile_picture(form.profile_image.data)
 
         employee = Employee(
-            employee_id=form.employee_id.data,
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            email=form.email.data,
-            phone=form.phone.data,
+            employee_id=form.employee_id.data.strip().upper(),
+            first_name=form.first_name.data.strip(),
+            last_name=form.last_name.data.strip(),
+            email=form.email.data.strip().lower(),
+            phone=form.phone.data.strip() if form.phone.data else None,
             gender=form.gender.data,
             date_of_birth=form.date_of_birth.data,
-            address=form.address.data,
-            city=form.city.data,
-            state=form.state.data,
-            country=form.country.data,
-            pincode=form.pincode.data,
+            address=form.address.data.strip() if form.address.data else None,
+            city=form.city.data.strip() if form.city.data else None,
+            state=form.state.data.strip() if form.state.data else None,
+            country=form.country.data.strip() if form.country.data else None,
+            pincode=form.pincode.data.strip() if form.pincode.data else None,
             department_id=form.department_id.data,
-            designation=form.designation.data,
+            designation=form.designation.data.strip(),
             joining_date=form.joining_date.data,
             salary=form.salary.data,
             status=form.status.data,
             profile_image=picture_file
         )
         db.session.add(employee)
-        db.session.commit()
-        flash(f'Employee {employee.full_name} added successfully!', 'success')
-        return redirect(url_for('employees.index'))
+        success, error_msg = safe_commit()
+        if success:
+            flash(f'Employee {employee.full_name} added successfully!', 'success')
+            return redirect(url_for('employees.index'))
+        else:
+            flash(f'Failed to add employee: {error_msg}', 'danger')
 
     return render_template('employees/add_edit.html', form=form, title='Add New Employee', is_edit=False)
 
@@ -102,27 +105,30 @@ def edit(id):
             picture_file = save_profile_picture(form.profile_image.data)
             employee.profile_image = picture_file
 
-        employee.employee_id = form.employee_id.data
-        employee.first_name = form.first_name.data
-        employee.last_name = form.last_name.data
-        employee.email = form.email.data
-        employee.phone = form.phone.data
+        employee.employee_id = form.employee_id.data.strip().upper()
+        employee.first_name = form.first_name.data.strip()
+        employee.last_name = form.last_name.data.strip()
+        employee.email = form.email.data.strip().lower()
+        employee.phone = form.phone.data.strip() if form.phone.data else None
         employee.gender = form.gender.data
         employee.date_of_birth = form.date_of_birth.data
-        employee.address = form.address.data
-        employee.city = form.city.data
-        employee.state = form.state.data
-        employee.country = form.country.data
-        employee.pincode = form.pincode.data
+        employee.address = form.address.data.strip() if form.address.data else None
+        employee.city = form.city.data.strip() if form.city.data else None
+        employee.state = form.state.data.strip() if form.state.data else None
+        employee.country = form.country.data.strip() if form.country.data else None
+        employee.pincode = form.pincode.data.strip() if form.pincode.data else None
         employee.department_id = form.department_id.data
-        employee.designation = form.designation.data
+        employee.designation = form.designation.data.strip()
         employee.joining_date = form.joining_date.data
         employee.salary = form.salary.data
         employee.status = form.status.data
         
-        db.session.commit()
-        flash(f'Employee {employee.full_name} updated successfully!', 'success')
-        return redirect(url_for('employees.view', id=employee.id))
+        success, error_msg = safe_commit()
+        if success:
+            flash(f'Employee {employee.full_name} updated successfully!', 'success')
+            return redirect(url_for('employees.view', id=employee.id))
+        else:
+            flash(f'Failed to update employee: {error_msg}', 'danger')
 
     return render_template('employees/add_edit.html', form=form, title=f'Edit {employee.full_name}', is_edit=True, employee=employee)
 
@@ -133,6 +139,10 @@ def delete(id):
     employee = Employee.query.get_or_404(id)
     name = employee.full_name
     db.session.delete(employee)
-    db.session.commit()
-    flash(f'Employee {name} deleted successfully.', 'info')
+    success, error_msg = safe_commit()
+    if success:
+        flash(f'Employee {name} deleted successfully.', 'info')
+    else:
+        flash(f'Failed to delete employee: {error_msg}', 'danger')
     return redirect(url_for('employees.index'))
+

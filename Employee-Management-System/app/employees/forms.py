@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, FloatField, DateField, SelectField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
+from sqlalchemy import func
 from app.models import Employee, Department
 from datetime import date
 
@@ -45,16 +46,22 @@ class EmployeeForm(FlaskForm):
         self.department_id.choices = [(d.id, d.department_name) for d in departments]
 
     def validate_employee_id(self, employee_id):
-        if employee_id.data != self.original_id:
-            emp = Employee.query.filter_by(employee_id=employee_id.data).first()
-            if emp:
-                raise ValidationError('Employee ID already exists.')
+        if employee_id.data:
+            code = employee_id.data.strip().upper()
+            orig = self.original_id.strip().upper() if self.original_id else None
+            if code != orig:
+                emp = Employee.query.filter(func.upper(Employee.employee_id) == code).first()
+                if emp:
+                    raise ValidationError('Employee ID already exists.')
 
     def validate_email(self, email):
-        if email.data != self.original_email:
-            emp = Employee.query.filter_by(email=email.data).first()
-            if emp:
-                raise ValidationError('An employee with this email already exists.')
+        if email.data:
+            email_val = email.data.strip().lower()
+            orig = self.original_email.strip().lower() if self.original_email else None
+            if email_val != orig:
+                emp = Employee.query.filter(func.lower(Employee.email) == email_val).first()
+                if emp:
+                    raise ValidationError('An employee with this email already exists.')
 
     def validate_salary(self, salary):
         if salary.data is not None and salary.data < 0:

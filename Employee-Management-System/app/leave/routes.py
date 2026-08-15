@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.leave import leave_bp
 from app.leave.forms import LeaveForm
-from app.models import Leave, Employee
+from app.models import Leave, Employee, safe_commit
 from app.extensions import db
 from app.auth.decorators import admin_required
 
@@ -47,13 +47,16 @@ def apply():
             leave_type=form.leave_type.data,
             start_date=form.start_date.data,
             end_date=form.end_date.data,
-            reason=form.reason.data,
+            reason=form.reason.data.strip() if form.reason.data else None,
             status='Pending'
         )
         db.session.add(leave_req)
-        db.session.commit()
-        flash('Leave application submitted successfully!', 'success')
-        return redirect(url_for('leave.index'))
+        success, error_msg = safe_commit()
+        if success:
+            flash('Leave application submitted successfully!', 'success')
+            return redirect(url_for('leave.index'))
+        else:
+            flash(f'Failed to submit leave application: {error_msg}', 'danger')
 
     return render_template('leave/apply.html', form=form)
 
@@ -62,8 +65,12 @@ def apply():
 def approve(id):
     leave_req = Leave.query.get_or_404(id)
     leave_req.status = 'Approved'
-    db.session.commit()
-    flash(f'Leave application #{leave_req.id} for {leave_req.employee.full_name} has been APPROVED.', 'success')
+    success, error_msg = safe_commit()
+    if success:
+        emp_name = leave_req.employee.full_name if leave_req.employee else f"Employee #{leave_req.employee_id}"
+        flash(f'Leave application #{leave_req.id} for {emp_name} has been APPROVED.', 'success')
+    else:
+        flash(f'Failed to approve leave: {error_msg}', 'danger')
     return redirect(url_for('leave.index'))
 
 @leave_bp.route('/reject/<int:id>', methods=['POST'])
@@ -71,6 +78,11 @@ def approve(id):
 def reject(id):
     leave_req = Leave.query.get_or_404(id)
     leave_req.status = 'Rejected'
-    db.session.commit()
-    flash(f'Leave application #{leave_req.id} for {leave_req.employee.full_name} has been REJECTED.', 'info')
+    success, error_msg = safe_commit()
+    if success:
+        emp_name = leave_req.employee.full_name if leave_req.employee else f"Employee #{leave_req.employee_id}"
+        flash(f'Leave application #{leave_req.id} for {emp_name} has been REJECTED.', 'info')
+    else:
+        flash(f'Failed to reject leave: {error_msg}', 'danger')
     return redirect(url_for('leave.index'))
+
