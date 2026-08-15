@@ -268,6 +268,30 @@ def init_database(app=None):
     def _do_init():
         db.create_all()
 
+        # Ensure missing columns exist in SQLite schema if using SQLite
+        try:
+            with db.engine.connect() as conn:
+                if db.engine.dialect.name == 'sqlite':
+                    res = conn.execute(db.text("PRAGMA table_info('employees');"))
+                    existing_cols = {row[1] for row in res.fetchall()}
+                    cols_to_add = [
+                        ('gender', 'VARCHAR(10)'),
+                        ('date_of_birth', 'DATE'),
+                        ('address', 'TEXT'),
+                        ('city', 'VARCHAR(50)'),
+                        ('state', 'VARCHAR(50)'),
+                        ('country', 'VARCHAR(50)'),
+                        ('pincode', 'VARCHAR(20)')
+                    ]
+                    for col_name, col_type in cols_to_add:
+                        if col_name not in existing_cols:
+                            conn.execute(db.text(f"ALTER TABLE employees ADD COLUMN {col_name} {col_type};"))
+                            print(f" -> [init_database] Added missing SQLite column: {col_name}")
+                    conn.commit()
+        except Exception as e:
+            print(f" -> [init_database] Schema migration note: {e}")
+
+
         admin_user = User.query.filter_by(username='admin').first()
         if not admin_user:
             admin_user = User(
