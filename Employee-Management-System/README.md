@@ -6,7 +6,7 @@ A full-featured, enterprise-grade Flask HR management web application designed f
 
 ## 🌐 Live Demo
 
-🚀 **Live Production Deployment:** [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
+🚀 **Live Demo:** [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
 
 ---
 
@@ -34,6 +34,7 @@ A full-featured, enterprise-grade Flask HR management web application designed f
 - **Flask-WTF 1.2.1 & WTForms 3.1.2** (CSRF & Form Validation)
 - **PyMySQL 1.1.1 & Cryptography 43.0.0** (MySQL Driver & Protocol Encryption)
 - **Pillow 10.x** (Profile Image Processing)
+- **email-validator 2.1.1+** (WTForms Email Validation)
 
 ### Database Layer
 - **MySQL 8.0+ / MariaDB** (Production Database Engine)
@@ -98,7 +99,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Environment Configuration
+### 3. Environment Configuration & Launch
 Copy `.env.example` to `.env` or set environment variables:
 ```bash
 # SQLite Fallback (Default when no URL is set)
@@ -108,6 +109,13 @@ python run.py
 export DATABASE_URL="mysql+pymysql://root:password@localhost:3306/employee_management_db"
 python run.py
 ```
+
+### 4. Access the Application
+
+| Environment | Access URL | Description |
+| :--- | :--- | :--- |
+| **Local Development** | [http://127.0.0.1:5000](http://127.0.0.1:5000) | Local Flask Development Server |
+| **Live Production** | 🚀 [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/) | Live Render Web Service |
 
 ---
 
@@ -144,6 +152,7 @@ python test_mysql_migration.py
    - **Start Command:** `gunicorn run:app`
    - **Environment Variables:** Set `DATABASE_URL` (MySQL) or leave default for SQLite.
 4. Render automatically builds and deploys using `render.yaml` and `Procfile`.
+5. Access the live production web service: 🚀 [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
 
 ---
 

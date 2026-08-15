@@ -4,6 +4,17 @@ This repository contains full-stack web application projects developed for the *
 
 ---
 
+## 🌐 Live Deployments & Application Access
+
+🚀 **Live Demo:** [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
+
+| Project | Local Development URL | Live Production URL |
+| :--- | :--- | :--- |
+| **Employee Management System** | `http://127.0.0.1:5000` | 🚀 [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/) |
+| **Attendance Management System** | `http://127.0.0.1:5000` | Local Deployment |
+
+---
+
 ## Projects
 
 ### 1. Attendance Management System
@@ -22,9 +33,10 @@ This repository contains full-stack web application projects developed for the *
 
 ### 2. Employee Management System
 
+- **Live Demo:** 🚀 [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
 - **Description:** A comprehensive Flask-based Human Resource (HR) management system designed to manage employee lifecycle records, company department hierarchies, daily attendance tracking, and employee leave workflows. It includes admin authentication, individual employee profile management, search and filtering tools, visual dashboard analytics, case-insensitive validation, database transaction safety (`safe_commit`), and automated deployment configuration for cloud hosting on Render.
 - **Technologies Used:**
-  - **Backend:** Python, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, WTForms, PyMySQL, Cryptography, python-dotenv
+  - **Backend:** Python, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, WTForms, PyMySQL, Cryptography, python-dotenv, email-validator
   - **Database:** MySQL (via PyMySQL with connection pooling `pool_pre_ping: True`) with automatic SQLite fallback (`sqlite:///instance/employee_system.db`)
   - **Frontend:** HTML5, CSS3, Bootstrap 5, JavaScript, Chart.js
   - **Deployment & Infrastructure:** Render (`render.yaml`), Gunicorn (`Procfile`), `runtime.txt`
