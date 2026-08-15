@@ -8,12 +8,13 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.config['SQLALCHEMY_DATABASE_URI'] = get_db_uri()
 
-
-    # Ensure instance and upload folders exist
+    # Ensure Flask instance directory and upload folders exist
+    os.makedirs(app.instance_path, exist_ok=True)
     instance_path = os.path.join(app.root_path, '..', 'instance')
     upload_path = os.path.join(app.root_path, 'static', 'uploads', 'profile_pics')
     os.makedirs(instance_path, exist_ok=True)
     os.makedirs(upload_path, exist_ok=True)
+
 
     # Initialize extensions with app
     db.init_app(app)
