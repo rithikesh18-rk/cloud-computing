@@ -107,10 +107,12 @@ def add():
                 flash(f'Failed to add employee: {error_msg}', 'danger')
 
         return render_template('employees/add_edit.html', form=form, title='Add New Employee', is_edit=False)
-    except Exception as e:
+    except BaseException as e:
         db.session.rollback()
-        flash(f'An unexpected error occurred: {str(e)}', 'danger')
-        return redirect(url_for('employees.index'))
+        import traceback
+        tb = traceback.format_exc()
+        return f"<h1>ADD ROUTE DIAGNOSTIC ERROR: {type(e).__name__}</h1><p>{str(e)}</p><pre>{tb}</pre>", 200
+
 
 
 @employees_bp.route('/<int:id>')
