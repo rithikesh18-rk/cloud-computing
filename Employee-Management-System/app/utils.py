@@ -16,11 +16,19 @@ def save_profile_picture(form_picture, folder='profile_pics'):
     Resizes image using Pillow to 300x300 for optimized performance.
     Returns saved relative filename.
     """
+    if not form_picture or not hasattr(form_picture, 'filename') or not form_picture.filename:
+        return 'default.jpg'
+
     random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(secure_filename(form_picture.filename))
+    sec_fn = secure_filename(form_picture.filename)
+    if not sec_fn:
+        return 'default.jpg'
+
+    _, f_ext = os.path.splitext(sec_fn)
     f_ext = f_ext.lower()
     if f_ext.lstrip('.') not in ALLOWED_EXTENSIONS:
         f_ext = '.jpg'
+
     
     picture_fn = random_hex + f_ext
     upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', folder)

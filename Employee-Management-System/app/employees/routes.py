@@ -58,10 +58,11 @@ def add():
 
         if form.validate_on_submit():
             picture_file = 'default.jpg'
-            if form.profile_image.data:
+            if form.profile_image.data and hasattr(form.profile_image.data, 'filename') and form.profile_image.data.filename:
                 picture_file = save_profile_picture(form.profile_image.data)
 
             dept_id = form.department_id.data if form.department_id.data and form.department_id.data != 0 else None
+
 
             employee = Employee(
                 employee_id=form.employee_id.data.strip().upper(),
@@ -117,9 +118,10 @@ def edit(id):
             form.department_id.data = employee.department_id
 
         if form.validate_on_submit():
-            if form.profile_image.data:
+            if form.profile_image.data and hasattr(form.profile_image.data, 'filename') and form.profile_image.data.filename:
                 picture_file = save_profile_picture(form.profile_image.data)
                 employee.profile_image = picture_file
+
 
             dept_id = form.department_id.data if form.department_id.data and form.department_id.data != 0 else None
 
