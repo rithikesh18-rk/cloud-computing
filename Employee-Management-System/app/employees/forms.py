@@ -4,7 +4,19 @@ from wtforms import StringField, FloatField, DateField, SelectField, TextAreaFie
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 from sqlalchemy import func
 from app.models import Employee, Department
-from datetime import date
+from datetime import date, datetime
+
+class SafeDateField(DateField):
+    """Subclass of DateField that safely handles str vs date objects in _value() without raising AttributeError."""
+    def _value(self):
+        if self.raw_data:
+            return ' '.join(self.raw_data)
+        if self.data:
+            if isinstance(self.data, (date, datetime)):
+                fmt = self.format[0] if isinstance(self.format, (list, tuple)) else self.format
+                return self.data.strftime(fmt)
+            return str(self.data)
+        return ''
 
 def safe_coerce(val):
     if val is None or val == '' or val == 'None' or val == '0':
@@ -25,7 +37,7 @@ class EmployeeForm(FlaskForm):
         ('Female', 'Female'),
         ('Other', 'Other')
     ], validators=[Optional()])
-    date_of_birth = DateField('Date of Birth', validators=[Optional()])
+    date_of_birth = SafeDateField('Date of Birth', validators=[Optional()])
     address = TextAreaField('Address', validators=[Optional()])
     city = StringField('City', validators=[Optional()])
     state = StringField('State', validators=[Optional()])
@@ -34,7 +46,8 @@ class EmployeeForm(FlaskForm):
     
     department_id = SelectField('Department', coerce=safe_coerce, validators=[Optional()])
     designation = StringField('Designation / Job Title *', validators=[DataRequired()])
-    joining_date = DateField('Joining Date *', validators=[DataRequired()])
+    joining_date = SafeDateField('Joining Date *', validators=[DataRequired()])
+
     salary = FloatField('Annual Salary ($) *', validators=[DataRequired()])
     status = SelectField('Employment Status *', choices=[
         ('Active', 'Active'),
