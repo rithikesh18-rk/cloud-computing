@@ -1,117 +1,152 @@
 # Employee Management System
 
-
-A full-featured, Flask-based HR management application designed for managing employees, departments, attendance tracking, and leave management efficiently with interactive analytics and a responsive UI.
+A full-featured, enterprise-grade Flask HR management web application designed for managing employee lifecycles, department hierarchies, daily attendance tracking, and leave request workflows with visual analytics, case-insensitive validation, database transaction safety, dual MySQL/SQLite engine support, and cloud deployment configuration.
 
 ---
 
 ## 🌐 Live Demo
 
-🚀 **Live Website:** [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
+🚀 **Live Production Deployment:** [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/)
 
 ---
 
-## ✨ Features
+## ✨ Core Features & Highlights
 
-- **🔐 Admin Authentication:** Secure login and logout system for administrative access control.
-- **👨‍💼 Employee Management:** Complete CRUD operations for employee records, job roles, and contact info.
-- **🏢 Department Management:** Organize company hierarchy by creating and managing departments and designations.
-- **👤 Employee Profiles:** Detailed individual employee profile views with comprehensive background details.
-- **📅 Attendance Tracking:** Real-time daily attendance logging and status monitoring.
-- **📝 Leave Management:** Streamlined leave requests submission, approval, and status tracking workflow.
-- **📊 Dashboard Analytics:** Visual dashboard displaying statistics, department metrics, and attendance overview.
-- **🔍 Search and Filtering:** Quick search bar and dynamic filtering across employees and departments.
-- **📱 Responsive Bootstrap UI:** Clean, modern, dynamic, mobile-friendly interface built with Bootstrap 5.
+- **🔐 Multi-Role Authentication:** Role-based access control (Admin & Employee roles) powered by Flask-Login and Werkzeug password hashing.
+- **👨‍💼 Employee Lifecycle Management:** Complete CRUD operations, job titles, department assignments, joining dates, and profile picture processing (Pillow thumbnail optimization).
+- **🏢 Department Hierarchies:** Organize organizational structure with department codes, descriptions, and dynamic employee count metrics.
+- **👤 Employee Profiles & Security:** Case-insensitive user account linkage, contact detail updates, and secure password changes.
+- **📅 Daily Attendance Tracking:** Attendance logging (Present, Absent, Half Day, Late), worked hours calculations, percentage tracking, and duplicate prevention.
+- **📝 Leave Request Workflow:** Streamlined leave applications, automatic day calculations, and Admin approval/rejection pipelines.
+- **📊 Analytics & Visual Dashboard:** Real-time metrics cards, Chart.js department breakdowns, and recent workforce activity logs.
+- **🛡️ Database Integrity & Transaction Safety:** Case-insensitive uniqueness validations for emails, IDs, and department codes with automatic rollback wrappers (`safe_commit`) preventing unhandled 500 server crashes.
+- **⚡ Dual Database Support:** Production-ready MySQL support via PyMySQL with automatic connection pooling (`pool_pre_ping: True`, `pool_recycle: 280`) and SQLite fallback.
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Backend
-- **Python**
-- **Flask**
-- **SQLAlchemy**
+### Backend & Core
+- **Python 3.11+**
+- **Flask 3.0.3**
+- **Flask-SQLAlchemy 3.1.1** (ORMs & Migrations)
+- **Flask-Login 0.6.3** (Session & Authentication)
+- **Flask-WTF 1.2.1 & WTForms 3.1.2** (CSRF & Form Validation)
+- **PyMySQL 1.1.1 & Cryptography 43.0.0** (MySQL Driver & Protocol Encryption)
+- **Pillow 10.x** (Profile Image Processing)
 
-### Database
-- **SQLite**
+### Database Layer
+- **MySQL 8.0+ / MariaDB** (Production Database Engine)
+- **SQLite 3** (Local Development Fallback)
 
 ### Frontend
-- **HTML**
-- **CSS**
-- **Bootstrap 5**
-- **JavaScript**
+- **HTML5 & Vanilla CSS3**
+- **Bootstrap 5.3.3**
+- **JavaScript (ES6)**
+- **Chart.js** (Dashboard Analytics)
+- **FontAwesome 6** (Icons)
 
-### Deployment
-- **Render**
-- **Gunicorn**
+### Infrastructure & Deployment
+- **Gunicorn 22.0.0** (WSGI Application Server)
+- **Render** (`render.yaml`, `Procfile`, `runtime.txt`)
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-Employee Management System/
+Employee-Management-System/
 ├── app/
-│   ├── attendance/         # Attendance tracking blueprint & views
-│   ├── auth/               # Authentication routes & logic
-│   ├── dashboard/          # Analytics & dashboard blueprint
-│   ├── departments/        # Department management blueprint
-│   ├── employees/          # Employee CRUD blueprint
-│   ├── leave/              # Leave request handling blueprint
-│   ├── profile/            # Employee profile views
-│   ├── static/             # CSS, JS, and asset files
-│   ├── templates/          # HTML templates
-│   ├── config.py           # Application configuration
-│   ├── extensions.py       # Flask extensions initialization
-│   ├── models.py           # Database models
-│   └── utils.py            # Helper and utility functions
-├── Procfile                # Gunicorn process declaration for Render
-├── render.yaml             # Render infrastructure blueprint
-├── requirements.txt        # Python dependencies
-└── run.py                  # Application entry point
+│   ├── attendance/         # Attendance tracking blueprint, forms, and routes
+│   ├── auth/               # Authentication, login, registration, decorators
+│   ├── dashboard/          # Analytics dashboard blueprint
+│   ├── departments/        # Department CRUD management blueprint
+│   ├── employees/          # Employee directory & CRUD blueprint
+│   ├── leave/              # Leave application & approval blueprint
+│   ├── profile/            # User profile management blueprint
+│   ├── static/             # Assets (CSS, JS, upload directories)
+│   ├── templates/          # Jinja2 HTML templates & layout structure
+│   ├── config.py           # Application configuration & MySQL/SQLite resolution
+│   ├── extensions.py       # SQLAlchemy & LoginManager initialization + SQLite PRAGMA
+│   ├── models.py           # Database models (User, Department, Employee, Attendance, Leave)
+│   └── utils.py            # Image processing & file utilities
+├── .env.example            # Environment variable template
+├── Procfile                # Gunicorn process definition for Render
+├── render.yaml             # Render deployment configuration
+├── requirements.txt        # Python dependency manifest
+├── runtime.txt             # Python runtime specification
+├── run.py                  # Application entry point & seed initial data
+├── test_full_system.py     # System verification test suite
+├── test_module2.py         # Database model verification test suite
+└── test_mysql_migration.py # MySQL DDL & fallback test suite
 ```
 
 ---
 
-## ⚙️ Installation Steps
+## ⚙️ Local Development & Setup
 
-1. **Clone repository:**
-   ```bash
-   git clone repository_url
-   cd "Employee Management System"
-   ```
+### 1. Clone & Set Up Virtual Environment
+```bash
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd "Employee-Management-System"
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-3. **Run application:**
-   ```bash
-   python run.py
-   ```
+### 3. Environment Configuration
+Copy `.env.example` to `.env` or set environment variables:
+```bash
+# SQLite Fallback (Default when no URL is set)
+python run.py
 
----
-
-## 🔑 Default Admin Credentials
-
-- **Username:** `admin`
-- **Password:** `admin123`
-
----
-
-## 🚀 Deployment
-
-The application is deployed on **Render** and automatically builds and deploys updates directly from the GitHub repository.
+# Or MySQL Database Connection String
+export DATABASE_URL="mysql+pymysql://root:password@localhost:3306/employee_management_db"
+python run.py
+```
 
 ---
 
-## 🖼️ Screenshots
+## 🔑 Default Credentials
 
-(Add application screenshots here)
+- **Admin Username:** `admin`
+- **Admin Password:** `admin123`
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+Run the automated verification test suites to confirm database model integrity, case-insensitivity, and endpoint routes:
+
+```bash
+# Test database models & relationship validations
+python test_module2.py
+
+# Test full application routes, permissions, and CRUD operations
+python test_full_system.py
+
+# Test MySQL configuration, URI transformation, and DDL schema compilation
+python test_mysql_migration.py
+```
+
+---
+
+## 🚀 Cloud Deployment (Render)
+
+1. Connect your GitHub repository (`cloud-computing`) to **Render**.
+2. Select **Web Service** environment.
+3. Configure settings:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn run:app`
+   - **Environment Variables:** Set `DATABASE_URL` (MySQL) or leave default for SQLite.
+4. Render automatically builds and deploys using `render.yaml` and `Procfile`.
 
 ---
 
 ## 🧑‍💻 Author
 
-Developed by: **rithikesh18-rk**
+Developed by: **Rithikesh S** (`rithikesh18-rk`)

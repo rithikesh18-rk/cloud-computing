@@ -22,12 +22,12 @@ This repository contains full-stack web application projects developed for the *
 
 ### 2. Employee Management System
 
-- **Description:** A comprehensive Flask-based Human Resource (HR) management system designed to manage employee lifecycle records, company department hierarchies, daily attendance tracking, and employee leave workflows. It includes admin authentication, individual employee profile management, search and filtering tools, visual dashboard analytics, and automated deployment configuration for cloud hosting on Render.
+- **Description:** A comprehensive Flask-based Human Resource (HR) management system designed to manage employee lifecycle records, company department hierarchies, daily attendance tracking, and employee leave workflows. It includes admin authentication, individual employee profile management, search and filtering tools, visual dashboard analytics, case-insensitive validation, database transaction safety (`safe_commit`), and automated deployment configuration for cloud hosting on Render.
 - **Technologies Used:**
-  - **Backend:** Python, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, WTForms, python-dotenv
-  - **Database:** SQLite
-  - **Frontend:** HTML5, CSS3, Bootstrap 5, JavaScript
-  - **Deployment & Infrastructure:** Render (`render.yaml`), Gunicorn (`Procfile`)
+  - **Backend:** Python, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, WTForms, PyMySQL, Cryptography, python-dotenv
+  - **Database:** MySQL (via PyMySQL with connection pooling `pool_pre_ping: True`) with automatic SQLite fallback (`sqlite:///instance/employee_system.db`)
+  - **Frontend:** HTML5, CSS3, Bootstrap 5, JavaScript, Chart.js
+  - **Deployment & Infrastructure:** Render (`render.yaml`), Gunicorn (`Procfile`), `runtime.txt`
 - **Original GitHub Repository:**
   https://github.com/rithikesh18-rk/employee-management-system
 

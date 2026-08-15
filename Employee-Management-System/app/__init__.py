@@ -1,11 +1,13 @@
 import os
 from flask import Flask, render_template
-from app.config import Config
+from app.config import Config, get_db_uri
 from app.extensions import db, login_manager
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_db_uri()
+
 
     # Ensure instance and upload folders exist
     instance_path = os.path.join(app.root_path, '..', 'instance')

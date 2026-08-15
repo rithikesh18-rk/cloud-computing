@@ -11,12 +11,15 @@ login_manager.login_message_category = 'info'
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
-    """Enforces SQLite Foreign Key constraints for relational integrity."""
-    cursor = dbapi_connection.cursor()
-    try:
-        cursor.execute("PRAGMA foreign_keys=ON;")
-    except Exception:
-        pass
-    finally:
-        cursor.close()
+    """Enforces SQLite Foreign Key constraints for relational integrity when using SQLite."""
+    if type(dbapi_connection).__module__.startswith('sqlite'):
+        cursor = dbapi_connection.cursor()
+        try:
+            cursor.execute("PRAGMA foreign_keys=ON;")
+        except Exception:
+            pass
+        finally:
+            cursor.close()
+
+
 
