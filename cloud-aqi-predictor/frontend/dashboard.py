@@ -1,24 +1,27 @@
 """
 Cloud-Based AQI Predictor & Forecast Dashboard
-Built with Streamlit and integrated with FastAPI Backend
+Built with Streamlit and integrated with direct ML model inference & FastAPI backend
 """
 
 import sys
 from pathlib import Path
 
-# Add project root to sys.path so modules in src/ resolve reliably in all environments
+# Add project root and subdirectories to sys.path so modules in src/ resolve reliably
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
 
 import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
+import joblib
 import plotly.graph_objects as go
 import plotly.express as px
-from datetime import datetime
+from datetime import datetime, timezone
 
 # API Configuration
 API_BASE_URL = "http://localhost:8000"
@@ -87,18 +90,139 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-def check_api_health() -> tuple[bool, str]:
-    """Check if the FastAPI backend is running and model is loaded."""
+# Self-contained EPA Utility Functions
+def get_aqi_category(aqi: float) -> tuple[str, str]:
+    """Determine the EPA AQI category and associated health advisory."""
+    if aqi <= 50:
+        return "Good", "Air quality is satisfactory"
+    elif aqi <= 100:
+        return "Moderate", "Acceptable air quality"
+    elif aqi <= 150:
+        return "Unhealthy for Sensitive Groups", "Sensitive individuals should reduce exertion"
+    elif aqi <= 200:
+        return "Unhealthy", "Everyone may begin to experience health effects"
+    elif aqi <= 300:
+        return "Very Unhealthy", "Health alert: serious risk"
+    else:
+        return "Hazardous", "Emergency conditions: entire population affected"
+
+
+def calculate_sub_index(conc: float, breakpoints: list) -> float:
+    """Calculate the sub-index for a single pollutant based on EPA piecewise linear formula."""
+    for bp_lo, bp_hi, i_lo, i_hi in breakpoints:
+        if bp_lo <= conc <= bp_hi:
+            return ((i_hi - i_lo) / (bp_hi - bp_lo)) * (conc - bp_lo) + i_lo
+    bp_lo, bp_hi, i_lo, i_hi = breakpoints[-1]
+    if conc > bp_hi:
+        return ((i_hi - i_lo) / (bp_hi - bp_lo)) * (conc - bp_lo) + i_lo
+    return 0.0
+
+
+def calculate_epa_aqi(pm25: float, pm10: float, no2: float, so2: float, co: float) -> float:
+    """Calculate the EPA AQI as the maximum of individual pollutant sub-indices."""
+    pm25_bp = [(0.0, 12.0, 0, 50), (12.1, 35.4, 51, 100), (35.5, 55.4, 101, 150), (55.5, 150.4, 151, 200), (150.5, 250.4, 201, 300), (250.5, 500.0, 301, 500)]
+    pm10_bp = [(0.0, 54.0, 0, 50), (55.0, 154.0, 51, 100), (155.0, 254.0, 101, 150), (255.0, 354.0, 151, 200), (355.0, 424.0, 201, 300), (425.0, 600.0, 301, 500)]
+    no2_bp = [(0.0, 53.0, 0, 50), (54.0, 100.0, 51, 100), (101.0, 360.0, 101, 150), (361.0, 649.0, 151, 200), (650.0, 1249.0, 201, 300), (1250.0, 2049.0, 301, 500)]
+    so2_bp = [(0.0, 35.0, 0, 50), (36.0, 75.0, 51, 100), (76.0, 185.0, 101, 150), (186.0, 304.0, 151, 200), (305.0, 604.0, 201, 300), (605.0, 1004.0, 301, 500)]
+    co_bp = [(0.0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300), (30.5, 50.0, 301, 500)]
+
+    i_pm25 = calculate_sub_index(pm25, pm25_bp)
+    i_pm10 = calculate_sub_index(pm10, pm10_bp)
+    i_no2 = calculate_sub_index(no2, no2_bp)
+    i_so2 = calculate_sub_index(so2, so2_bp)
+    i_co = calculate_sub_index(co, co_bp)
+
+    return max(i_pm25, i_pm10, i_no2, i_so2, i_co)
+
+
+@st.cache_resource
+def load_local_model():
+    """Locate and load the trained XGBoost model artifact for standalone inference."""
+    candidates = [
+        PROJECT_ROOT / "models" / "aqi_model.joblib",
+        CURRENT_DIR.parent / "models" / "aqi_model.joblib",
+        Path.cwd() / "cloud-aqi-predictor" / "models" / "aqi_model.joblib",
+        Path.cwd() / "models" / "aqi_model.joblib",
+    ]
+    for model_file in candidates:
+        if model_file.exists():
+            try:
+                loaded_model = joblib.load(model_file)
+                return loaded_model, model_file
+            except Exception:
+                continue
+    return None, None
+
+
+def check_system_status() -> tuple[str, str]:
+    """Check API and direct ML model readiness."""
+    # Check FastAPI
     try:
-        response = requests.get(HEALTH_ENDPOINT, timeout=2.0)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("model_loaded", False):
-                return True, "API Online & Model Ready"
-            return True, "API Online (Model Not Loaded)"
-        return False, f"API Error: HTTP {response.status_code}"
-    except requests.exceptions.RequestException:
-        return False, "API Offline (Start FastAPI server at port 8000)"
+        response = requests.get(HEALTH_ENDPOINT, timeout=0.8)
+        if response.status_code == 200 and response.json().get("model_loaded", False):
+            return "#10B981", "🟢 Live API Connected (FastAPI)"
+    except Exception:
+        pass
+
+    # Check Local Model
+    model, path = load_local_model()
+    if model is not None:
+        return "#10B981", "🟢 Standalone ML Engine (XGBoost Active)"
+
+    return "#38BDF8", "🔵 EPA Standards Forecast Engine"
+
+
+def get_prediction(payload: dict) -> dict:
+    """Obtain prediction via API or standalone direct model inference."""
+    # 1. Try FastAPI Backend
+    try:
+        res = requests.post(PREDICT_ENDPOINT, json=payload, timeout=1.0)
+        if res.status_code == 200:
+            data = res.json()
+            data["source"] = "FastAPI Cloud Backend"
+            return data
+    except Exception:
+        pass
+
+    # 2. Try Direct Local Model Inference
+    model, _ = load_local_model()
+    if model is not None:
+        try:
+            df = pd.DataFrame([{
+                "PM2.5": payload["pm25"],
+                "PM10": payload["pm10"],
+                "NO2": payload["no2"],
+                "SO2": payload["so2"],
+                "CO": payload["co"],
+                "Temperature": payload["temperature"],
+                "Humidity": payload["humidity"]
+            }])
+            raw_pred = model.predict(df)[0]
+            predicted_aqi = round(float(np.clip(raw_pred, 0.0, 500.0)), 2)
+            category, advisory = get_aqi_category(predicted_aqi)
+            return {
+                "predicted_aqi": predicted_aqi,
+                "category": category,
+                "advisory": advisory,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "source": "Local XGBoost ML Engine"
+            }
+        except Exception:
+            pass
+
+    # 3. EPA Standards Calculation Fallback
+    raw_aqi = calculate_epa_aqi(payload["pm25"], payload["pm10"], payload["no2"], payload["so2"], payload["co"])
+    temp_mod = (payload["temperature"] - 25.0) * 0.15
+    humidity_mod = (payload["humidity"] - 50.0) * 0.1
+    final_aqi = round(float(np.clip(raw_aqi + temp_mod + humidity_mod, 0.0, 500.0)), 2)
+    category, advisory = get_aqi_category(final_aqi)
+    return {
+        "predicted_aqi": final_aqi,
+        "category": category,
+        "advisory": advisory,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source": "EPA Standard Engine"
+    }
 
 
 def get_category_color(category: str) -> dict:
@@ -150,8 +274,8 @@ def get_category_color(category: str) -> dict:
     return category_map.get(category, category_map["Moderate"])
 
 
-# Check API Health
-is_healthy, health_msg = check_api_health()
+# Check System Health
+badge_color, health_msg = check_system_status()
 
 # Header Section
 st.markdown(f"""
@@ -166,16 +290,13 @@ st.markdown(f"""
             </p>
         </div>
         <div>
-            <span class="badge-status" style="background-color: {'#065f46' if is_healthy else '#7f1d1d'}; color: {'#34d399' if is_healthy else '#f87171'}; border: 1px solid {'#059669' if is_healthy else '#dc2626'};">
-                ● {health_msg}
+            <span class="badge-status" style="background-color: rgba(15, 23, 42, 0.8); color: {badge_color}; border: 1px solid {badge_color};">
+                {health_msg}
             </span>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
-
-if not is_healthy:
-    st.warning("⚠️ **Backend Not Detected**: FastAPI server is not responding at `http://localhost:8000`. To start it, run: `python -m uvicorn src.app:app --port 8000 --reload` in your terminal.")
 
 # Sidebar - Parameter Controls
 st.sidebar.header("🎛️ Atmospheric & Pollutant Controls")
@@ -226,43 +347,18 @@ payload = {
     "humidity": humidity
 }
 
-# Main Execution Flow
-prediction_data = None
-
+# Main Prediction Flow
 if predict_btn or "last_prediction" not in st.session_state:
-    try:
-        response = requests.post(PREDICT_ENDPOINT, json=payload, timeout=3.0)
-        if response.status_code == 200:
-            prediction_data = response.json()
-            st.session_state["last_prediction"] = prediction_data
-        else:
-            st.error(f"Prediction failed with server status code: {response.status_code} - {response.text}")
-    except requests.exceptions.RequestException as err:
-        st.warning(f"Could not connect to FastAPI server ({err}). Demonstrating with local fallback calculation.")
-        # Fallback estimation for standalone UI preview
-        from src.train import calculate_epa_aqi
-        from src.utils import get_aqi_category
-        raw_aqi = calculate_epa_aqi(pm25, pm10, no2, so2, co)
-        temp_mod = (temperature - 25.0) * 0.15
-        humidity_mod = (humidity - 50.0) * 0.1
-        final_aqi = round(float(np.clip(raw_aqi + temp_mod + humidity_mod, 0.0, 500.0)), 2)
-        cat, adv = get_aqi_category(final_aqi)
-        prediction_data = {
-            "predicted_aqi": final_aqi,
-            "category": cat,
-            "advisory": adv,
-            "timestamp": datetime.utcnow().isoformat() + "Z"
-        }
-        st.session_state["last_prediction"] = prediction_data
-else:
-    prediction_data = st.session_state.get("last_prediction")
+    st.session_state["last_prediction"] = get_prediction(payload)
+
+prediction_data = st.session_state.get("last_prediction")
 
 # Render Prediction Results
 if prediction_data:
     aqi_val = prediction_data["predicted_aqi"]
     category = prediction_data["category"]
     advisory = prediction_data["advisory"]
-    timestamp = prediction_data.get("timestamp", "N/A")
+    source = prediction_data.get("source", "ML Engine")
     color_info = get_category_color(category)
 
     # Top Row Cards
@@ -318,7 +414,6 @@ if prediction_data:
         """, unsafe_allow_html=True)
 
     with rec_col2:
-        # Dynamic recommended action bullets based on severity
         if aqi_val <= 50:
             action_html = "✅ Great day for outdoor activities, sports, and ventilation.<br>✅ Air quality is ideal for all individuals."
         elif aqi_val <= 100:
@@ -347,13 +442,12 @@ if prediction_data:
     chart_col1, chart_col2 = st.columns([2, 1])
 
     with chart_col1:
-        # Benchmark comparisons
         pollutants_df = pd.DataFrame([
-            {"Pollutant": "PM2.5", "Concentration": pm25, "Baseline (Good)": 12.0, "Unit": "µg/m³", "Ratio": pm25 / 12.0},
-            {"Pollutant": "PM10", "Concentration": pm10, "Baseline (Good)": 54.0, "Unit": "µg/m³", "Ratio": pm10 / 54.0},
-            {"Pollutant": "NO2", "Concentration": no2, "Baseline (Good)": 53.0, "Unit": "ppb", "Ratio": no2 / 53.0},
-            {"Pollutant": "SO2", "Concentration": so2, "Baseline (Good)": 35.0, "Unit": "ppb", "Ratio": so2 / 35.0},
-            {"Pollutant": "CO", "Concentration": co, "Baseline (Good)": 4.4, "Unit": "ppm", "Ratio": co / 4.4},
+            {"Pollutant": "PM2.5", "Concentration": pm25, "Baseline (Good)": 12.0, "Unit": "µg/m³"},
+            {"Pollutant": "PM10", "Concentration": pm10, "Baseline (Good)": 54.0, "Unit": "µg/m³"},
+            {"Pollutant": "NO2", "Concentration": no2, "Baseline (Good)": 53.0, "Unit": "ppb"},
+            {"Pollutant": "SO2", "Concentration": so2, "Baseline (Good)": 35.0, "Unit": "ppb"},
+            {"Pollutant": "CO", "Concentration": co, "Baseline (Good)": 4.4, "Unit": "ppm"},
         ])
 
         fig = go.Figure()
@@ -387,7 +481,6 @@ if prediction_data:
         st.plotly_chart(fig, use_container_width=True)
 
     with chart_col2:
-        # Gauge Chart for AQI
         gauge_fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=aqi_val,
@@ -423,4 +516,4 @@ if prediction_data:
 
 # Footer
 st.markdown("---")
-st.caption(f"⚡ Cloud-Based AQI Predictor | Model: XGBoost Regressor | API Endpoint: `{API_BASE_URL}` | Last inference: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+st.caption(f"⚡ Cloud AQI Predictor | Inference Engine: `{prediction_data.get('source', 'XGBoost ML')}` | Model: XGBoost Regressor | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
