@@ -6,7 +6,7 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.1.0-EB6424.svg?style=flat&logo=xgboost&logoColor=white)](https://xgboost.readthedocs.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![CI/CD Pipeline](https://img.shields.io/badge/GitHub_Actions-Passing-2088FF.svg?style=flat&logo=githubactions&logoColor=white)](https://github.com/rithikesh18-rk/cloud-computing/actions)
-[![Streamlit Cloud](https://img.shields.io/badge/Streamlit_Cloud-Live_Demo-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white)](https://share.streamlit.io/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
 
 A production-grade, cloud-native Machine Learning atmospheric forecasting application designed to predict real-time **Air Quality Index (AQI)** and provide actionable **EPA-standard health advisories** using multi-pollutant environmental telemetry and meteorological conditions.
 
@@ -16,9 +16,13 @@ A production-grade, cloud-native Machine Learning atmospheric forecasting applic
 
 Experience the interactive prediction dashboard online:
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
+
+👉 **Live URL:** [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
+
 | Platform | URL / Access | Status |
 | :--- | :--- | :--- |
-| **Streamlit Community Cloud** | 🌐 **[Launch Live AQI Predictor App](https://share.streamlit.io/)** | 🟢 Operational |
+| **Streamlit Community Cloud** | 🚀 **[Launch Live AQI Predictor App](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)** | 🟢 Operational |
 | **FastAPI Swagger UI Docs** | `http://localhost:8000/docs` | 🟢 Local / Docker |
 | **FastAPI Health Check** | `http://localhost:8000/health` | 🟢 Local / Docker |
 

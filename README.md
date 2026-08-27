@@ -7,6 +7,7 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.1.0-EB6424.svg?style=flat&logo=xgboost&logoColor=white)](https://xgboost.readthedocs.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![CI/CD](https://img.shields.io/badge/GitHub_Actions-Passing-2088FF.svg?style=flat&logo=githubactions&logoColor=white)](https://github.com/rithikesh18-rk/cloud-computing/actions)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
 
 This repository contains production-ready full-stack and cloud-native machine learning projects developed for the **Cloud Computing** subject. Each project is organized into its own self-contained directory with its complete source code, configuration files, automated tests, dependencies, and documentation.
 
@@ -14,9 +15,9 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 ## 🌐 Live Deployments & Application Access
 
-| Project | Platform | Access URL | Status |
+| Project | Platform | Access Link / Button | Status |
 | :--- | :--- | :--- | :--- |
-| **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | 🚀 **[Launch Live AQI Predictor](https://share.streamlit.io/)** | 🟢 Active |
+| **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>👉 [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app) | 🟢 Active |
 | **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
 | **Attendance Management System** | 💻 Local / VM | `http://127.0.0.1:5000` | 🟢 Verified |
 
@@ -26,7 +27,8 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 ### 1. 🌫️ Cloud-Based Air Quality Index (AQI) Predictor & Forecast
 
-- **Live Demo:** 🚀 **[Launch AQI Predictor App](https://share.streamlit.io/)**
+- **Live Demo:** [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
+- **Direct URL:** [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)
 - **Description:** A production-grade Machine Learning cloud application for real-time Air Quality Index prediction and official EPA-standard health advisories. Evaluates multi-pollutant metrics (PM2.5, PM10, NO2, SO2, CO) and weather conditions (Temperature, Humidity) with an XGBoost Regressor model ($R^2 = 0.9991$).
 - **Architecture Highlights:**
   - **Dual-Mode ML Engine:** Runs standalone in-process cached inference on Streamlit Community Cloud and interfaces with FastAPI REST endpoints in distributed environments.
