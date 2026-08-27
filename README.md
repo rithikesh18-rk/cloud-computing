@@ -12,6 +12,7 @@ This repository contains full-stack web application projects developed for the *
 | :--- | :--- | :--- |
 | **Employee Management System** | `http://127.0.0.1:5000` | 🚀 [https://employee-management-system-bv3y.onrender.com/](https://employee-management-system-bv3y.onrender.com/) |
 | **Attendance Management System** | `http://127.0.0.1:5000` | Local Deployment |
+| **Cloud-Based AQI Predictor** | `http://127.0.0.1:8501` (Dashboard)<br>`http://127.0.0.1:8000` (API) | Local / Docker Deployment |
 
 ---
 
@@ -42,6 +43,17 @@ This repository contains full-stack web application projects developed for the *
   - **Deployment & Infrastructure:** Render (`render.yaml`), Gunicorn (`Procfile`), `runtime.txt`
 - **Original GitHub Repository:**
   https://github.com/rithikesh18-rk/employee-management-system
+
+---
+
+### 3. Cloud-Based Air Quality Index (AQI) Predictor
+
+- **Description:** A high-accuracy Machine Learning atmospheric pollution prediction platform with real-time EPA-standard health advisories. Powered by an XGBoost Regressor model ($R^2 = 0.9991$), FastAPI REST API backend with Pydantic validation, Streamlit interactive web dashboard with dynamic pollutant threshold gauges, and containerized Docker setup.
+- **Technologies Used:**
+  - **Machine Learning:** Python, XGBoost Regressor, Scikit-Learn, Pandas, NumPy, Joblib
+  - **Backend & Cloud API:** FastAPI, Uvicorn, Pydantic v2, CORS Middleware
+  - **Frontend Dashboard:** Streamlit, Plotly, HTML5/CSS3 Custom Components
+  - **DevOps & Containerization:** Docker, Docker Compose, GitHub Actions CI/CD pipeline
 
 ---
 
