@@ -3,6 +3,15 @@ Cloud-Based AQI Predictor & Forecast Dashboard
 Built with Streamlit and integrated with FastAPI Backend
 """
 
+import sys
+from pathlib import Path
+
+# Add project root to sys.path so modules in src/ resolve reliably in all environments
+CURRENT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = CURRENT_DIR.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import streamlit as st
 import requests
 import pandas as pd
