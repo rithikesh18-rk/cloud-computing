@@ -1,0 +1,31 @@
+# ==============================================================================
+# Streamlit Production Configuration
+# Optimized for Streamlit Community Cloud Deployment
+# ==============================================================================
+
+[theme]
+# Clean Industrial High-Contrast Theme
+primaryColor = "#3B82F6"
+backgroundColor = "#0F172A"
+secondaryBackgroundColor = "#1E293B"
+textColor = "#F8FAFC"
+font = "sans serif"
+
+[server]
+# Headless production execution
+headless = true
+enableCORS = true
+enableXsrfProtection = true
+maxUploadSize = 50
+maxMessageSize = 200
+runOnSave = false
+enableStaticServing = false
+
+[browser]
+# Disable telemetry and usage statistics
+gatherUsageStats = false
+
+[client]
+# Minimal UI chrome and production security
+toolbarMode = "minimal"
+showErrorDetails = false

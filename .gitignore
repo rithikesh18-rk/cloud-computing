@@ -87,3 +87,14 @@ Thumbs.db
 *.pem
 *.key
 *.crt
+
+# Streamlit Secrets & Credentials (CRITICAL - NEVER COMMIT)
+.streamlit/secrets.toml
+*/.streamlit/secrets.toml
+**/.streamlit/secrets.toml
+secrets.toml
+*.secrets.toml
+
+# Bytecode & Local Backups
+*.pyc
+_root_*

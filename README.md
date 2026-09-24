@@ -20,6 +20,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>👉 [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app) | 🟢 Active |
 | **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
 | **Attendance Management System** | 💻 Local / VM | `http://127.0.0.1:5000` | 🟢 Verified |
+| **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud / Local | `http://localhost:8501` | 🟢 Active |
 
 ---
 
@@ -53,6 +54,19 @@ This repository contains production-ready full-stack and cloud-native machine le
 - **Description:** A full-stack, responsive academic attendance management platform built for educational institutions. Features multi-role authentication (Admin, Faculty, Student), dynamic institutional branding, class attendance marking with bulk toggles, attendance percentage calculations with shortage (< 75%) alerts, Chart.js analytics, and downloadable PDF & Excel export capabilities.
 - **Technologies Used:** Python, Flask, Flask-SQLAlchemy, PyMySQL / SQLite, Bootstrap 5, Chart.js, ReportLab (PDF), OpenPyXL (Excel).
 - **Subdirectory:** [`Attendance-Management-System/`](./Attendance-Management-System/)
+
+---
+
+### 4. 📦 Cloud-Based Multi-Warehouse Inventory Management System
+
+- **Live Local URL:** `http://localhost:8501`
+- **Description:** An enterprise-grade, cloud-native inventory control and warehouse orchestration platform targeting Streamlit Community Cloud and managed MySQL DBaaS. Features dynamic multi-warehouse balance monitoring, real-time critical low-stock alerting, explicit ACID transaction handlers with row-level locking (`SELECT ... FOR UPDATE`), atomic inter-warehouse transfers, and an ML demand forecasting engine with linear burn rate estimation and 14-day stock depletion projections.
+- **Architecture Highlights:**
+  - **ACID Transaction Handlers:** Thread-safe connection pooling, row-level locking, and exponential backoff retry decorators for deadlock resilience.
+  - **Machine Learning Forecasting:** Linear trend daily burn rate estimation, Estimated Days Until Stockout (EDUS), and dynamic safety replenishment recommendations.
+  - **Cloud-Ready DBaaS Schema:** Normalized InnoDB schema (5 tables, 3 analytical SQL views, foreign key constraints, check constraints).
+- **Technologies Used:** Python 3.11, Streamlit 1.38, SQLAlchemy 2.0, PyMySQL, Scikit-Learn, Plotly, MySQL 8.0+.
+- **Subdirectory:** [`Cloud-Based-Inventory-Management-System/`](./Cloud-Based-Inventory-Management-System/)
 
 ---
 
@@ -100,6 +114,23 @@ cloud-computing/
 │   ├── Dockerfile                   # Multi-stage production container
 │   ├── requirements.txt             # Project dependencies
 │   └── README.md                    # Detailed subfolder documentation
+│
+├── Cloud-Based-Inventory-Management-System/ # 📦 Multi-Warehouse Inventory System
+│   ├── .streamlit/
+│   │   ├── config.toml              # Streamlit cloud UI & theme settings
+│   │   └── secrets.toml.example     # Cloud DBaaS credentials template
+│   ├── database/
+│   │   ├── schema.sql               # MySQL 8.0 DDL (InnoDB, Views, Constraints)
+│   │   └── seed_data.sql            # Realistic industrial supply seed data
+│   ├── scripts/
+│   │   └── init_db.py               # Automated schema & seed execution script
+│   ├── utils/
+│   │   ├── db_handler.py            # ACID transaction engine & connection pool
+│   │   └── forecasting.py           # ML demand forecasting & burn rate model
+│   ├── app.py                       # 5-Tab Streamlit enterprise dashboard
+│   ├── DEPLOYMENT.md                # Production Cloud DBaaS & Streamlit playbook
+│   ├── requirements.txt             # Exact pinned dependencies
+│   └── README.md                    # Dedicated inventory system documentation
 │
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
