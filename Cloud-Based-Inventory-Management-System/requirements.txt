@@ -1,24 +1,16 @@
-# ==============================================================================
-# Cloud-Based Multi-Warehouse Inventory Management System
-# Production Dependency Manifest for Streamlit Community Cloud
-# Compatible with Python 3.10, 3.11, 3.12 (Debian Linux Runtime)
-# ==============================================================================
+# Core Streamlit Web Application
+streamlit>=1.35.0, <2.0.0
+pyarrow>=14.0.0, <25.0.0
 
-# Core Application Framework
-streamlit==1.38.0
-
-# Database Connectivity, ORM & Authentication
-SQLAlchemy==2.0.32
-PyMySQL==1.1.1
-cryptography==42.0.8
-
-# Data Manipulation & Scientific Computing
-pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.5.1
+# Data Processing & Numerical Analytics
+pandas>=2.0.0, <3.0.0
+numpy>=1.24.0, <3.0.0
 
 # Interactive Visualizations
-plotly==5.23.0
+plotly>=5.19.0, <6.0.0
 
-# Environment & Configuration Management
-python-dotenv==1.0.1
+# Database Connectivity (Cloud MySQL DBaaS / SQLAlchemy Connection Pooling)
+SQLAlchemy>=2.0.0, <3.0.0
+PyMySQL>=1.1.0, <2.0.0
+cryptography>=41.0.0
+python-dotenv>=1.0.0
