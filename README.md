@@ -19,8 +19,8 @@ This repository contains production-ready full-stack and cloud-native machine le
 | :--- | :--- | :--- | :--- |
 | **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>👉 [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app) | 🟢 Active |
 | **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
-| **Attendance Management System** | 💻 Local / VM | `http://127.0.0.1:5000` | 🟢 Verified |
-| **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud / Local | `http://localhost:8501` | 🟢 Active |
+| **Attendance Management System** | ⚡ Render Cloud | 🚀 [Launch Live Attendance System](https://attendance-management-system-1-3fey.onrender.com/) | 🟢 Active |
+| **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud | 🚀 [Launch Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/) | 🟢 Active |
 
 ---
 
@@ -51,6 +51,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 ### 3. 🎓 Attendance Management System
 
+- **Live Demo:** 🚀 [https://attendance-management-system-1-3fey.onrender.com/](https://attendance-management-system-1-3fey.onrender.com/)
 - **Description:** A full-stack, responsive academic attendance management platform built for educational institutions. Features multi-role authentication (Admin, Faculty, Student), dynamic institutional branding, class attendance marking with bulk toggles, attendance percentage calculations with shortage (< 75%) alerts, Chart.js analytics, and downloadable PDF & Excel export capabilities.
 - **Technologies Used:** Python, Flask, Flask-SQLAlchemy, PyMySQL / SQLite, Bootstrap 5, Chart.js, ReportLab (PDF), OpenPyXL (Excel).
 - **Subdirectory:** [`Attendance-Management-System/`](./Attendance-Management-System/)
@@ -59,7 +60,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 ### 4. 📦 Cloud-Based Multi-Warehouse Inventory Management System
 
-- **Live Local URL:** `http://localhost:8501`
+- **Live Demo:** 🚀 [Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/)
 - **Description:** An enterprise-grade, cloud-native inventory control and warehouse orchestration platform targeting Streamlit Community Cloud and managed MySQL DBaaS. Features dynamic multi-warehouse balance monitoring, real-time critical low-stock alerting, explicit ACID transaction handlers with row-level locking (`SELECT ... FOR UPDATE`), atomic inter-warehouse transfers, and an ML demand forecasting engine with linear burn rate estimation and 14-day stock depletion projections.
 - **Architecture Highlights:**
   - **ACID Transaction Handlers:** Thread-safe connection pooling, row-level locking, and exponential backoff retry decorators for deadlock resilience.
