@@ -17,7 +17,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 | Project | Platform | Access Link / Button | Status |
 | :--- | :--- | :--- | :--- |
-| **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>👉 [https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app) | 🟢 Active |
+| **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>🚀 [Launch Live AQI Predictor](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app/) | 🟢 Active |
 | **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
 | **Attendance Management System** | ⚡ Render Cloud | 🚀 [Launch Live Attendance System](https://attendance-management-system-1-3fey.onrender.com/) | 🟢 Active |
 | **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud | 🚀 [Launch Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/) | 🟢 Active |
