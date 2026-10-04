@@ -4,6 +4,14 @@ A production-ready enterprise inventory management solution engineered for high 
 
 ---
 
+## 🚀 Live Demo
+
+🔗 [Open Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/)
+
+The application is deployed using Streamlit Community Cloud and currently supports Demo Mode with a mock inventory dataset. It demonstrates multi-warehouse inventory monitoring, stock alerts, warehouse operations, demand analytics, and transaction auditing.
+
+---
+
 ## 🏛️ System Architecture
 
 ```mermaid
