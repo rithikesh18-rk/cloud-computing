@@ -27,6 +27,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | [Cloud-Cost-Optimization](./Cloud-Cost-Optimization) | Automated cloud resource monitoring, rightsizing, idle-instance detection, and cost-allocation analyzer | Python, Cloud APIs, Analytics / Dashboard | Complete |
 | [Internet-Speed-Monitoring](./Internet-Speed-Monitoring) | Automated network telemetry tool tracking latency, jitter, download/upload bandwidth, and ISP SLA compliance | Python, Speedtest CLI / Ping APIs, SQLite / CSV, Dashboard | Complete |
 | [Website-Uptime-Monitoring](./Website-Uptime-Monitoring) | Automated endpoint health-checker tracking HTTP status codes, SSL expiry, latency, and incident alerting | Python, Requests / Asyncio, SQLite / Logs, Dashboard | Complete |
+| [Cloud-Password-Manager](./Cloud-Password-Manager) | Zero-knowledge encrypted cloud credential vault featuring client-side AES-GCM encryption and PBKDF2/Argon2 key derivation | Python, Cryptography (AES-256), SQLite / Cloud DB, Streamlit / FastAPI | Complete |
 
 ---
 
@@ -131,6 +132,21 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **Dual-Stack Runtime:** Standalone Python/Streamlit analytics dashboard & CLI auditor + full-stack Node.js engine with SQLite/knex persistence.
 - **Technologies Used:** Python 3.11, Streamlit, Plotly, Pandas, SQLite 3, Cryptography, Requests / Urllib, Node.js.
 - **Subdirectory:** [`Website-Uptime-Monitoring/`](./Website-Uptime-Monitoring/)
+
+---
+
+### 9. 🔐 Zero-Knowledge Cloud Password Manager & Vault
+
+- **Dashboard:** 🚀 [Local Streamlit UI](http://localhost:8501) | [Interactive CLI Auditor](file:///./Cloud-Password-Manager/main.py)
+- **Description:** An enterprise-grade, zero-knowledge encrypted credential vault and password manager. Eliminates cloud credential breach risks and third-party host snooping by generating 256-bit AES encryption keys strictly in client memory using Argon2id/PBKDF2 and storing only AES-256-GCM ciphertext and nonces.
+- **Architecture Highlights:**
+  - **Zero-Knowledge Architecture:** Master passwords never leave the client memory unhashed; cloud storage holds only authenticated ciphertext, unique 96-bit nonces, and independent auth verifiers.
+  - **Cryptographic Primitives:** AES-256-GCM authenticated symmetric encryption paired with Argon2id / PBKDF2-HMAC-SHA256 (600,000 iterations).
+  - **Credential Lifecycle:** Add, reveal, search, edit, and organize credentials with clipboard safety and in-memory decryption.
+  - **Vulnerability & Entropy Auditor:** Live Shannon entropy calculation and vault analysis detecting weak or reused passwords.
+  - **Dual-Stack Runtime:** Python Streamlit dark-mode dashboard & terminal console + Rust/Bitwarden upstream server compatibility.
+- **Technologies Used:** Python 3.11+, Cryptography (AES-256-GCM), Argon2id, PBKDF2, Streamlit, SQLite 3, Rust / Bitwarden API.
+- **Subdirectory:** [`Cloud-Password-Manager/`](./Cloud-Password-Manager/)
 
 ---
 
@@ -246,6 +262,17 @@ cloud-computing/
 │   ├── server/                      # Full-stack Node.js backend services
 │   ├── src/                         # Vue 3 / Vite frontend application
 │   └── README.md                    # Dedicated project overview & quickstart
+│
+├── Cloud-Password-Manager/          # 🔐 Zero-Knowledge Cloud Password Manager & Vault
+│   ├── app.py                       # Interactive Streamlit vault dashboard & web application
+│   ├── main.py                      # Dual-mode interactive CLI console & crypto benchmark auditor
+│   ├── crypto.py                    # Cryptographic engine (AES-256-GCM, Argon2id, PBKDF2, Entropy)
+│   ├── db.py                        # SQLite persistence layer, authentication verifier & audit logger
+│   ├── schema.sql                   # Database schema definitions with zero-knowledge constraints
+│   ├── test_crypto.py               # Automated pytest suite (key derivation, AES-GCM, tamper checks)
+│   ├── requirements.txt             # Pinned Python package dependencies
+│   ├── VAULTWARDEN_GUIDE.md         # Preserved upstream enterprise Rust vault documentation
+│   └── README.md                    # Dedicated zero-knowledge project overview & documentation
 │
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
@@ -368,6 +395,32 @@ streamlit run app.py
 
 # Or run terminal audit report:
 python app.py
+```
+
+---
+
+## ⚡ Quick Start: Cloud Password Manager
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/Cloud-Password-Manager
+
+# 2. Virtual environment setup
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run interactive CLI / Crypto Benchmark (Terminal 1)
+python main.py
+# Or run automated cryptographic benchmark:
+# python main.py --demo
+
+# 5. Launch Zero-Knowledge Vault Web Dashboard (Terminal 2)
+streamlit run app.py
 ```
 
 ---
