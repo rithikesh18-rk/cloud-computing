@@ -1,4 +1,6 @@
-# Cloud Computing Projects
+# Cloud Computing Repository
+
+A collection of cloud architecture implementations, resource managers, and distributed systems.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688.svg?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -15,13 +17,14 @@ This repository contains production-ready full-stack and cloud-native machine le
 
 ## 🌐 Live Deployments & Application Access
 
-| Project | Platform | Access Link / Button | Status |
+| Project / Module | Description | Core Stack | Status |
 | :--- | :--- | :--- | :--- |
-| **Cloud-Based AQI Predictor** | 🎈 Streamlit Cloud | [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app)<br>🚀 [Launch Live AQI Predictor](https://cloudaqipredictor-mxappeflcb2uurjcacex2uq.streamlit.app/) | 🟢 Active |
-| **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
-| **Attendance Management System** | ⚡ Render Cloud | 🚀 [Launch Live Attendance System](https://attendance-management-system-1-3fey.onrender.com/) | 🟢 Active |
-| **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud | 🚀 [Launch Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/) | 🟢 Active |
-| **CloudPulse AI** | ⚡ FastAPI + React Cloud Dashboard | 🚀 [Explore CloudPulse AI](./cloudpulse-ai/) | 🟢 Active |
+| **[Cloud-Based AQI Predictor](./cloud-aqi-predictor)** | Real-time Air Quality Index prediction and official EPA health advisories with XGBoost Regressor | Python 3.11, XGBoost, FastAPI, Streamlit, Docker | Complete |
+| **[Employee Management System](./Employee-Management-System)** | Full-stack HR portal managing employee lifecycles, departments, and leave workflows | Python, Flask, SQLAlchemy, MySQL, Render | Complete |
+| **[Attendance Management System](./Attendance-Management-System)** | Multi-role academic attendance system with short-attendance alerting and PDF/Excel reporting | Python, Flask, SQLite / MySQL, Bootstrap 5, Chart.js | Complete |
+| **[Multi-Warehouse Inventory System](./Cloud-Based-Inventory-Management-System)** | Enterprise multi-warehouse inventory control with ACID transactions & ML demand forecasting | Python, Streamlit, MySQL DBaaS, SQLAlchemy, Scikit-Learn | Complete |
+| **[CloudPulse AI](./cloudpulse-ai)** | Predictive cloud workload forecasting and autoscaling benchmark simulation lab | Python 3.11, FastAPI, Random Forest, React 18, Vite, TypeScript | Complete |
+| [Cloud-Cost-Optimization](./Cloud-Cost-Optimization) | Automated cloud resource monitoring, rightsizing, idle-instance detection, and cost-allocation analyzer | Python, Cloud APIs, Analytics / Dashboard | Complete |
 
 ---
 
@@ -82,6 +85,20 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **7-View Modern Dashboard:** Overview, Workload Analytics, Multi-Step Predictions, Resource Optimization, Simulation Lab, Experiment Reports (with CSV export), and System Settings built with React 18, Vite, TypeScript, Tailwind CSS, and Recharts.
 - **Technologies Used:** Python 3.11, FastAPI, Pydantic v2, Scikit-Learn, Pandas, NumPy, SQLAlchemy, React 18, Vite, TypeScript, Tailwind CSS, Lucide Icons, Recharts.
 - **Subdirectory:** [`cloudpulse-ai/`](./cloudpulse-ai/)
+
+---
+
+### 6. 💰 Cloud Cost Optimization & Resource Governor
+
+- **Dashboard:** 🚀 [Local Cost Governor UI](http://localhost:8501) | [Next.js Full-Stack Portal](http://localhost:3000)
+- **Description:** An enterprise multi-cloud resource governor and cost observability hub. Monitors compute utilization (CPU, memory, storage IOPS) across AWS, GCP, and Azure, detects daily/monthly billing spikes using statistical rolling Z-score anomalies, and automatically generates rightsizing and idle-instance shutdown recommendations with projected annual OpEx savings.
+- **Architecture Highlights:**
+  - **Utilization Telemetry Engine:** Continuous tracking of compute utilization, memory pressure, and I/O profiles across heterogeneous cloud fleets.
+  - **Billing Anomaly Detection:** Rolling baseline 3-sigma statistical anomaly detector identifying silent billing spikes and attributing root causes.
+  - **Automated Rightsizing & Governor:** Enforces idle resource shutdown (`TAG_AND_SHUTDOWN`) and instance downscaling (`RIGHTSIZE_DOWNGRADE`).
+  - **Dual-Stack Runtime:** Standalone Python/Streamlit analytics dashboard + decoupled Go Gin REST API & Next.js 15 web portal with TimescaleDB & Redis.
+- **Technologies Used:** Python 3.11, Streamlit, Plotly, Pandas, NumPy, Go 1.21+, Next.js 15, React 19, TypeScript, Tailwind CSS, PostgreSQL / TimescaleDB, Docker Compose.
+- **Subdirectory:** [`Cloud-Cost-Optimization/`](./Cloud-Cost-Optimization/)
 
 ---
 
@@ -165,8 +182,41 @@ cloud-computing/
 │   │   └── package.json             # React 18 + Vite + Tailwind dependencies
 │   └── README.md                    # Comprehensive academic & technical report
 │
+├── Cloud-Cost-Optimization/         # 💰 Multi-Cloud Cost Optimization & Resource Governor
+│   ├── app.py                       # Dual-mode Python dashboard (Streamlit UI & CLI auditor)
+│   ├── governor.py                  # Core Resource Governor analytics engine
+│   ├── requirements.txt             # Python analytics & dashboard dependencies
+│   ├── backend/                     # Full-stack Go Gin REST API server
+│   ├── frontend/                    # Next.js 15 TypeScript cost monitoring portal
+│   ├── docker-compose.yml           # TimescaleDB & Redis container configuration
+│   └── README.md                    # Dedicated project overview & quickstart
+│
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
+```
+
+---
+
+## ⚡ Quick Start: Cloud Cost Optimization
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/Cloud-Cost-Optimization
+
+# 2. Virtual environment setup
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Launch Interactive Dashboard (Terminal 1)
+streamlit run app.py
+
+# Or run terminal audit report:
+python app.py
 ```
 
 ---
