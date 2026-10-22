@@ -28,6 +28,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | [Internet-Speed-Monitoring](./Internet-Speed-Monitoring) | Automated network telemetry tool tracking latency, jitter, download/upload bandwidth, and ISP SLA compliance | Python, Speedtest CLI / Ping APIs, SQLite / CSV, Dashboard | Complete |
 | [Website-Uptime-Monitoring](./Website-Uptime-Monitoring) | Automated endpoint health-checker tracking HTTP status codes, SSL expiry, latency, and incident alerting | Python, Requests / Asyncio, SQLite / Logs, Dashboard | Complete |
 | [Cloud-Password-Manager](./Cloud-Password-Manager) | Zero-knowledge encrypted cloud credential vault featuring client-side AES-GCM encryption and PBKDF2/Argon2 key derivation | Python, Cryptography (AES-256), SQLite / Cloud DB, Streamlit / FastAPI | Complete |
+| [Cloud-Utility-Tools-Website](./Cloud-Utility-Tools-Website) | Unified cloud-native web suite offering essential developer & sysadmin utilities (DNS lookup, CIDR calculator, Base64/JWT decoder, file format converter, hash generator) | Python / FastAPI / Streamlit or React / Tailwind, Cloud APIs | Complete |
 
 ---
 
@@ -147,6 +148,21 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **Dual-Stack Runtime:** Python Streamlit dark-mode dashboard & terminal console + Rust/Bitwarden upstream server compatibility.
 - **Technologies Used:** Python 3.11+, Cryptography (AES-256-GCM), Argon2id, PBKDF2, Streamlit, SQLite 3, Rust / Bitwarden API.
 - **Subdirectory:** [`Cloud-Password-Manager/`](./Cloud-Password-Manager/)
+
+---
+
+### 10. 🛠️ Cloud Utility Tools Suite & Web Platform
+
+- **Dashboard:** 🚀 [Local Streamlit UI](http://localhost:8501) | [FastAPI Swagger Docs](http://127.0.0.1:8000/docs) | [Vue 3 Web Suite](./Cloud-Utility-Tools-Website/)
+- **Description:** A unified, production-ready developer and sysadmin web suite offering essential cloud diagnostics, networking tools, cryptographic utilities, and format converters. Eliminates privacy exposure and reliance on ad-heavy third-party utility sites.
+- **Architecture Highlights:**
+  - **Networking & DNS Engine:** DNS record lookup (A, AAAA, MX, TXT, SOA), CIDR subnet boundary calculator with usable IP planning, RDAP WHOIS queries, and IP geolocation with RFC1918 classification.
+  - **Security & Cryptography:** JWT claim inspector and expiration tracker, Base64/URL component encoding, cryptographic hash engine (SHA-256, SHA-512, MD5, HMAC), and CSPRNG high-entropy password generator.
+  - **Data Serialization:** Bi-directional JSON ↔ YAML ↔ CSV transformations, pretty-printer / minifier, and 5-field cron syntax parser with upcoming execution timelines.
+  - **System Diagnostics:** HTTP response header security posture auditor (HSTS, CSP, X-Frame-Options) and direct TLS socket SSL/TLS certificate validity inspector.
+  - **Dual-Stack Platform:** Python (Streamlit visual UI + FastAPI REST service) and full-stack Vue 3 / Vite single-page application.
+- **Technologies Used:** Python 3.11+, FastAPI, Uvicorn, Streamlit, dnspython, PyJWT, Cryptography, PyYAML, Requests, Vue 3, Vite, TypeScript, UnoCSS.
+- **Subdirectory:** [`Cloud-Utility-Tools-Website/`](./Cloud-Utility-Tools-Website/)
 
 ---
 
@@ -273,6 +289,18 @@ cloud-computing/
 │   ├── requirements.txt             # Pinned Python package dependencies
 │   ├── VAULTWARDEN_GUIDE.md         # Preserved upstream enterprise Rust vault documentation
 │   └── README.md                    # Dedicated zero-knowledge project overview & documentation
+│
+├── Cloud-Utility-Tools-Website/       # 🛠️ Cloud Utility Tools Suite & Web Platform
+│   ├── app.py                       # Dual-mode Python dashboard (Streamlit UI & CLI launcher)
+│   ├── main.py                      # FastAPI REST service & CLI diagnostic audit
+│   ├── test_tools.py                # Automated Pytest validation test suite
+│   ├── requirements.txt             # Pinned backend Python dependencies
+│   ├── tools/                       # Modular micro-tools (DNS, CIDR, JWT, Hashes, SSL)
+│   ├── static/                      # Custom dark-mode styles and vector branding
+│   ├── templates/                   # Exportable audit templates and schemas
+│   ├── components/                  # Reusable dashboard metric cards and status badges
+│   ├── src/                         # Upstream Vue 3 / Vite web application
+│   └── README.md                    # Exhaustive project documentation & API guide
 │
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
@@ -421,6 +449,33 @@ python main.py
 
 # 5. Launch Zero-Knowledge Vault Web Dashboard (Terminal 2)
 streamlit run app.py
+```
+
+---
+
+## ⚡ Quick Start: Cloud Utility Tools Suite
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/Cloud-Utility-Tools-Website
+
+# 2. Virtual environment setup
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Launch Interactive Web Dashboard (Terminal 1)
+streamlit run app.py
+
+# 5. Launch FastAPI REST Service (Terminal 2)
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+
+# Or run terminal diagnostic audit:
+python main.py --audit
 ```
 
 ---

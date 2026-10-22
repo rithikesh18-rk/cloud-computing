@@ -1,0 +1,5 @@
+Subnet_Name,CIDR_Block,VPC_Name,Availability_Zone,Usable_Hosts,Purpose
+Public-Subnet-1,10.0.1.0/24,Production-VPC,us-east-1a,254,Ingress ALB & NAT Gateway
+Private-App-Subnet-1,10.0.10.0/24,Production-VPC,us-east-1a,254,Kubernetes Workload Pods
+Private-Database-Subnet-1,10.0.20.0/26,Production-VPC,us-east-1a,62,PostgreSQL Multi-AZ Cluster
+Cache-Subnet-1,10.0.30.0/27,Production-VPC,us-east-1a,30,Redis In-Memory Cluster
