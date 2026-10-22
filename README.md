@@ -26,6 +26,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | **[CloudPulse AI](./cloudpulse-ai)** | Predictive cloud workload forecasting and autoscaling benchmark simulation lab | Python 3.11, FastAPI, Random Forest, React 18, Vite, TypeScript | Complete |
 | [Cloud-Cost-Optimization](./Cloud-Cost-Optimization) | Automated cloud resource monitoring, rightsizing, idle-instance detection, and cost-allocation analyzer | Python, Cloud APIs, Analytics / Dashboard | Complete |
 | [Internet-Speed-Monitoring](./Internet-Speed-Monitoring) | Automated network telemetry tool tracking latency, jitter, download/upload bandwidth, and ISP SLA compliance | Python, Speedtest CLI / Ping APIs, SQLite / CSV, Dashboard | Complete |
+| [Website-Uptime-Monitoring](./Website-Uptime-Monitoring) | Automated endpoint health-checker tracking HTTP status codes, SSL expiry, latency, and incident alerting | Python, Requests / Asyncio, SQLite / Logs, Dashboard | Complete |
 
 ---
 
@@ -115,6 +116,21 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **Client-Side HTML5 Suite:** Embedded zero-plugin web speedtest powered by pure JavaScript and Web Workers.
 - **Technologies Used:** Python 3.11+, Streamlit, Plotly, SQLite3, Pandas, HTML5, Web Workers, Docker.
 - **Subdirectory:** [`Internet-Speed-Monitoring/`](./Internet-Speed-Monitoring/)
+
+---
+
+### 8. 🌐 Cloud Website Uptime & Endpoint Reliability Monitor
+
+- **Dashboard:** 🚀 [Local Streamlit UI](http://localhost:8501) | [CLI Health Auditor](file:///./Website-Uptime-Monitoring/app.py)
+- **Description:** An enterprise-grade, distributed website health-checker, latency observability engine, and SLA compliance monitoring hub. Features automated multi-endpoint periodic HTTP/HTTPS probing, SSL/TLS certificate expiry tracking, incident state machine lifecycles, and multi-channel alerting hooks.
+- **Architecture Highlights:**
+  - **Multi-Endpoint Health Poller:** Continuous HTTP/HTTPS availability checks, redirection handling, and precision response latency measurement.
+  - **SSL/TLS Expiration Watchdog:** Direct TLS socket handshake verification, extraction of certificate validity, and automated expiration warnings (< 30 days).
+  - **Incident State Machine:** Tracks endpoint transitions (`OPERATIONAL` ↔ `DOWN`), measures exact downtime duration, and logs root causes.
+  - **SLA Availability Engine:** Computes rolling 24-hour, 7-day, and 30-day SLA availability compliance percentages and fleet average latencies.
+  - **Dual-Stack Runtime:** Standalone Python/Streamlit analytics dashboard & CLI auditor + full-stack Node.js engine with SQLite/knex persistence.
+- **Technologies Used:** Python 3.11, Streamlit, Plotly, Pandas, SQLite 3, Cryptography, Requests / Urllib, Node.js.
+- **Subdirectory:** [`Website-Uptime-Monitoring/`](./Website-Uptime-Monitoring/)
 
 ---
 
@@ -220,6 +236,17 @@ cloud-computing/
 │   ├── docker/                      # Container configurations & Dockerfiles
 │   └── README.md                    # Dedicated project documentation & quickstart playbook
 │
+├── Website-Uptime-Monitoring/        # 🌐 Cloud Website Uptime & Reliability Monitor
+│   ├── app.py                       # Dual-mode Python dashboard (Streamlit UI & CLI auditor)
+│   ├── checker.py                   # Core polling engine, SSL tracker & incident manager
+│   ├── endpoints.json               # Configurable endpoint target registry
+│   ├── requirements.txt             # Python analytics & dashboard dependencies
+│   ├── uptime_monitor.db            # SQLite persistence store for health checks & incidents
+│   ├── logs/                        # Historical alert dispatches and probe logs
+│   ├── server/                      # Full-stack Node.js backend services
+│   ├── src/                         # Vue 3 / Vite frontend application
+│   └── README.md                    # Dedicated project overview & quickstart
+│
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
 ```
@@ -312,6 +339,35 @@ uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
 
 # 4. Launch Streamlit UI (Terminal 2)
 streamlit run frontend/dashboard.py
+```
+
+---
+
+## ⚡ Quick Start: Website Uptime Monitoring
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/Website-Uptime-Monitoring
+
+# 2. Virtual environment setup
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run polling/checker engine (Terminal 1)
+python checker.py --once
+# Or run continuous daemon:
+# python checker.py --interval 30
+
+# 5. Launch Interactive Dashboard (Terminal 2)
+streamlit run app.py
+
+# Or run terminal audit report:
+python app.py
 ```
 
 ---

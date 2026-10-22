@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Cloudflare DNS & Edge",
+    "url": "https://1.1.1.1",
+    "check_interval": 30,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "name": "GitHub Public API",
+    "url": "https://api.github.com",
+    "check_interval": 60,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  },
+  {
+    "id": 3,
+    "name": "Python Software Foundation",
+    "url": "https://www.python.org",
+    "check_interval": 60,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  },
+  {
+    "id": 4,
+    "name": "FastAPI Framework Docs",
+    "url": "https://fastapi.tiangolo.com",
+    "check_interval": 60,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  },
+  {
+    "id": 5,
+    "name": "Wikipedia Foundation",
+    "url": "https://www.wikipedia.org",
+    "check_interval": 60,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  },
+  {
+    "id": 6,
+    "name": "Synthetic Edge Canary (503 Alert Test)",
+    "url": "https://httpstat.us/503",
+    "check_interval": 120,
+    "timeout": 5,
+    "expected_status": 200,
+    "is_active": true
+  }
+]
