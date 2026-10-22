@@ -25,6 +25,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | **[Multi-Warehouse Inventory System](./Cloud-Based-Inventory-Management-System)** | Enterprise multi-warehouse inventory control with ACID transactions & ML demand forecasting | Python, Streamlit, MySQL DBaaS, SQLAlchemy, Scikit-Learn | Complete |
 | **[CloudPulse AI](./cloudpulse-ai)** | Predictive cloud workload forecasting and autoscaling benchmark simulation lab | Python 3.11, FastAPI, Random Forest, React 18, Vite, TypeScript | Complete |
 | [Cloud-Cost-Optimization](./Cloud-Cost-Optimization) | Automated cloud resource monitoring, rightsizing, idle-instance detection, and cost-allocation analyzer | Python, Cloud APIs, Analytics / Dashboard | Complete |
+| [Internet-Speed-Monitoring](./Internet-Speed-Monitoring) | Automated network telemetry tool tracking latency, jitter, download/upload bandwidth, and ISP SLA compliance | Python, Speedtest CLI / Ping APIs, SQLite / CSV, Dashboard | Complete |
 
 ---
 
@@ -99,6 +100,21 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **Dual-Stack Runtime:** Standalone Python/Streamlit analytics dashboard + decoupled Go Gin REST API & Next.js 15 web portal with TimescaleDB & Redis.
 - **Technologies Used:** Python 3.11, Streamlit, Plotly, Pandas, NumPy, Go 1.21+, Next.js 15, React 19, TypeScript, Tailwind CSS, PostgreSQL / TimescaleDB, Docker Compose.
 - **Subdirectory:** [`Cloud-Cost-Optimization/`](./Cloud-Cost-Optimization/)
+
+---
+
+### 7. 📶 Real-Time Internet Speed & Network Reliability Monitor
+
+- **Dashboard:** 🚀 [Local Telemetry UI](http://localhost:8501) | [HTML5 Speedtest Engine](./Internet-Speed-Monitoring/index.html)
+- **Description:** An automated network telemetry and reliability monitoring system tracking latency, jitter, download/upload throughput, packet loss, and ISP Service Level Agreement (SLA) compliance. Identifies silent ISP peak-hour bandwidth throttling, micro-outages, and logs time-series telemetry into SQLite and CSV stores.
+- **Architecture Highlights:**
+  - **Automated Network Telemetry:** Dual-engine benchmarking using socket handshakes, CDN chunk testing, and speedtest APIs for robust, resilient data collection.
+  - **ISP SLA Compliance Engine:** Real-time violation detection against configurable download, upload, ping, jitter, and packet loss targets.
+  - **Diurnal Throttling Analytics:** Identifies systematic evening peak congestion windows and recurring bandwidth throttling.
+  - **Interactive Streamlit Portal:** Real-time KPI dials, Plotly trend curves, latency distribution histograms, and instant on-demand speedtest execution.
+  - **Client-Side HTML5 Suite:** Embedded zero-plugin web speedtest powered by pure JavaScript and Web Workers.
+- **Technologies Used:** Python 3.11+, Streamlit, Plotly, SQLite3, Pandas, HTML5, Web Workers, Docker.
+- **Subdirectory:** [`Internet-Speed-Monitoring/`](./Internet-Speed-Monitoring/)
 
 ---
 
@@ -191,8 +207,46 @@ cloud-computing/
 │   ├── docker-compose.yml           # TimescaleDB & Redis container configuration
 │   └── README.md                    # Dedicated project overview & quickstart
 │
+├── Internet-Speed-Monitoring/       # 📶 Real-Time Internet Speed & Network Reliability Monitor
+│   ├── monitor.py                   # Automated network telemetry daemon & benchmark engine
+│   ├── app.py                       # Interactive Streamlit dashboard & CLI reporter
+│   ├── requirements.txt             # Python analytics & visualization dependencies
+│   ├── telemetry.db                 # SQLite database for historical time-series metrics
+│   ├── telemetry.csv                # Exportable CSV telemetry logs
+│   ├── index.html                   # Lightweight HTML5 speedtest web interface
+│   ├── speedtest.js                 # Client-side speed test orchestration engine
+│   ├── speedtest_worker.js          # Web Worker handling async XHR download/upload
+│   ├── backend/                     # Multi-language backend telemetry endpoints (PHP, Node, Go)
+│   ├── docker/                      # Container configurations & Dockerfiles
+│   └── README.md                    # Dedicated project documentation & quickstart playbook
+│
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
+```
+
+---
+
+## ⚡ Quick Start: Internet Speed & Network Reliability Monitor
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/Internet-Speed-Monitoring
+
+# 2. Virtual environment setup
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run benchmark or start telemetry daemon
+python monitor.py               # One-off benchmark
+python monitor.py --daemon      # Periodic background monitor
+
+# 5. Launch Interactive Dashboard
+streamlit run app.py
 ```
 
 ---
