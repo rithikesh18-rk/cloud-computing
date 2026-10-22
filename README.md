@@ -21,6 +21,7 @@ This repository contains production-ready full-stack and cloud-native machine le
 | **Employee Management System** | ⚡ Render Cloud | 🚀 **[Launch Live HR Portal](https://employee-management-system-bv3y.onrender.com/)** | 🟢 Active |
 | **Attendance Management System** | ⚡ Render Cloud | 🚀 [Launch Live Attendance System](https://attendance-management-system-1-3fey.onrender.com/) | 🟢 Active |
 | **Multi-Warehouse Inventory System** | 🎈 Streamlit Cloud | 🚀 [Launch Cloud Inventory Orchestrator](https://rk-inventory-cloud.streamlit.app/) | 🟢 Active |
+| **CloudPulse AI** | ⚡ FastAPI + React Cloud Dashboard | 🚀 [Explore CloudPulse AI](./cloudpulse-ai/) | 🟢 Active |
 
 ---
 
@@ -68,6 +69,19 @@ This repository contains production-ready full-stack and cloud-native machine le
   - **Cloud-Ready DBaaS Schema:** Normalized InnoDB schema (5 tables, 3 analytical SQL views, foreign key constraints, check constraints).
 - **Technologies Used:** Python 3.11, Streamlit 1.38, SQLAlchemy 2.0, PyMySQL, Scikit-Learn, Plotly, MySQL 8.0+.
 - **Subdirectory:** [`Cloud-Based-Inventory-Management-System/`](./Cloud-Based-Inventory-Management-System/)
+
+---
+
+### 5. ⚡ CloudPulse AI — Predictive Cloud Workload Forecasting & Resource Optimization System
+
+- **Dashboard:** 🚀 [Local CloudPulse UI](http://127.0.0.1:5173/) | [FastAPI Swagger Docs](http://127.0.0.1:8000/docs)
+- **Description:** An AI-powered Cloud Infrastructure Management and Simulation System. CloudPulse AI addresses the challenges of dynamic cloud resource allocation by pairing a multi-step forward Random Forest workload forecaster with a discrete-event cloud cluster simulator. It benchmarks reactive threshold auto-scaling against predictive auto-scaling to eliminate latency spikes, minimize SLA violations, and prevent over-provisioning expenditure.
+- **Architecture Highlights:**
+  - **Workload Forecasting Engine:** 14-day 5-minute interval telemetry generator with diurnal rhythms and Poisson spikes; lag features ($t-1, t-2, t-3, t-6$), rolling metrics (3 & 6 steps), cyclical harmonic encodings, and strictly chronological 80/20 train/test splits. Multi-step recursive forecasting across 3, 6, and 12-step horizons ($R^2 \ge 0.95$).
+  - **Discrete Cloud Simulator:** Full virtual instance lifecycle (`ACTIVE`, `PROVISIONING`, `TERMINATING`), dynamic queueing latency penalty $L_t = L_{base} \cdot \max\left(1, \left(\frac{\lambda_t}{C_t}\right)^2\right)$, SLA violation threshold tracking ($>200\text{ms}$), and real-time node-hour cost model.
+  - **7-View Modern Dashboard:** Overview, Workload Analytics, Multi-Step Predictions, Resource Optimization, Simulation Lab, Experiment Reports (with CSV export), and System Settings built with React 18, Vite, TypeScript, Tailwind CSS, and Recharts.
+- **Technologies Used:** Python 3.11, FastAPI, Pydantic v2, Scikit-Learn, Pandas, NumPy, SQLAlchemy, React 18, Vite, TypeScript, Tailwind CSS, Lucide Icons, Recharts.
+- **Subdirectory:** [`cloudpulse-ai/`](./cloudpulse-ai/)
 
 ---
 
@@ -133,8 +147,48 @@ cloud-computing/
 │   ├── requirements.txt             # Exact pinned dependencies
 │   └── README.md                    # Dedicated inventory system documentation
 │
+├── cloudpulse-ai/                   # ⚡ Predictive Cloud Workload Forecasting & Auto-Scaling
+│   ├── backend/
+│   │   ├── app/
+│   │   │   ├── ml/                  # Workload generator, preprocessor, RF regressor
+│   │   │   ├── simulation/          # Virtual instance, Reactive & Predictive policies, engine
+│   │   │   ├── routes/              # FastAPI endpoints (health, dataset, forecast, simulation)
+│   │   │   └── database.py          # SQLite engine & ORM models
+│   │   ├── data/                    # Reproducible synthetic workload telemetry
+│   │   ├── tests/                   # Full Pytest test suite (ML, simulation, APIs)
+│   │   └── requirements.txt         # Pinned backend dependencies
+│   ├── frontend/
+│   │   ├── src/
+│   │   │   ├── components/          # Reusable dashboard widgets (MetricCard, InstanceCard, etc.)
+│   │   │   ├── pages/               # 7 interactive views (Overview, Analytics, Simulation Lab)
+│   │   │   └── api/                 # Strongly typed Axios HTTP client
+│   │   └── package.json             # React 18 + Vite + Tailwind dependencies
+│   └── README.md                    # Comprehensive academic & technical report
+│
 ├── requirements.txt                 # Root Streamlit Cloud dependencies
 └── README.md                        # Master repository documentation
+```
+
+---
+
+## ⚡ Quick Start: CloudPulse AI
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rithikesh18-rk/cloud-computing.git
+cd cloud-computing/cloudpulse-ai
+
+# 2. Launch FastAPI Backend (Terminal 1)
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# 3. Launch React Frontend (Terminal 2)
+cd ../frontend
+npm install
+npm run dev
 ```
 
 ---

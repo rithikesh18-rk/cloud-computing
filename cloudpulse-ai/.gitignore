@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.cache
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+
+# Databases (Exclude SQLite runtime DB, KEEP synthetic CSV datasets)
+*.db
+*.sqlite
+*.sqlite3
+backend/data/cloudpulse.db
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
